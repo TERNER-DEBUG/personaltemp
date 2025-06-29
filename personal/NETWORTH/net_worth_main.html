@@ -1,0 +1,445 @@
+{% extends "personal/base.html" %}
+{% block title %}{{ t('net_worth_calculator', default='Net Worth Calculator') }}{% endblock %}
+{% block extra_head %}
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    {% set tool_name = 'net_worth_calculator' %}
+    {% set tool_icon = 'fa-balance-scale' %}
+    {% set subtitle = t('net_worth_calculate_wealth', default='Calculate your net worth and track your wealth') %}
+    {% include 'personal/GENERAL/tool_header.html' %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ t('general_' + message, default=message) }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('general_close', default='Close') }}"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="netWorthTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="calculator-tab" data-bs-toggle="tab" data-bs-target="#calculator" type="button" role="tab" aria-controls="calculator" aria-selected="true">
+                <i class="fas fa-calculator"></i> {{ t('net_worth_calculator', default='Calculator') }}
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab" aria-controls="dashboard" aria-selected="false">
+                <i class="fas fa-chart-line"></i> {{ t('net_worth_dashboard', default='Dashboard') }}
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="netWorthTabContent">
+        <!-- Calculator Tab -->
+        <div class="tab-pane fade show active" id="calculator" role="tabpanel" aria-labelledby="calculator-tab">
+            <form method="POST" action="{{ url_for('net_worth.main') }}" id="netWorthForm" class="validate-form">
+                {{ form.csrf_token }}
+                <input type="hidden" name="action" value="calculate_net_worth">
+
+                <!-- Personal Information -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-user"></i> {{ t('net_worth_personal_info', default='Personal Information') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('general_first_name', default='First Name') }}</label>
+                                    {{ form.first_name(class="form-control", placeholder=t('general_first_name_placeholder', default='e.g., Muhammad, Bashir, Umar')) }}
+                                    <div class="invalid-feedback">{{ t('general_first_name_required', default='First name is required') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('general_email', default='Email') }}</label>
+                                    {{ form.email(class="form-control", placeholder=t('general_email_placeholder', default='e.g., muhammad@example.com')) }}
+                                    <div class="invalid-feedback">{{ t('general_email_required', default='Valid email is required') }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            {{ form.send_email(class="form-check-input") }}
+                            <label class="form-check-label">{{ t('net_worth_send_email', default='Send me my net worth summary by email') }}</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assets Section -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-plus-circle text-success"></i> {{ t('net_worth_what_you_own', default='What You Own (Assets)') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('net_worth_cash_and_savings', default='Cash & Savings') }}</label>
+                                    {{ form.cash_savings(class="form-control number-input", placeholder=t('net_worth_cash_savings_placeholder', default='e.g., 500,000')) }}
+                                    <div class="invalid-feedback">{{ t('net_worth_cash_savings_required', default='Cash & Savings is required') }}</div>
+                                    <div class="form-text">{{ t('net_worth_cash_savings_tooltip', default='Money in bank accounts, cash, Ajo/Esusu/Adashe') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('net_worth_investments', default='Investments') }}</label>
+                                    {{ form.investments(class="form-control number-input", placeholder=t('net_worth_investments_placeholder', default='e.g., 1,000,000')) }}
+                                    <div class="invalid-feedback">{{ t('net_worth_investments_required', default='Investments is required') }}</div>
+                                    <div class="form-text">{{ t('net_worth_investments_tooltip', default='Value of stocks, bonds, farming, or other investments') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('net_worth_physical_property', default='Physical Property') }}</label>
+                                    {{ form.property(class="form-control number-input", placeholder=t('net_worth_property_placeholder', default='e.g., 5,000,000')) }}
+                                    <div class="invalid-feedback">{{ t('net_worth_physical_property_required', default='Physical Property is required') }}</div>
+                                    <div class="form-text">{{ t('net_worth_property_tooltip', default='Value of houses, real estate, or land you own') }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Liabilities Section -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-minus-circle text-danger"></i> {{ t('net_worth_what_you_owe', default='What You Owe (Liabilities)') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('net_worth_loans', default='Loans & Debts') }}</label>
+                                    {{ form.loans(class="form-control number-input", placeholder=t('net_worth_loans_placeholder', default='e.g., 200,000')) }}
+                                    <div class="invalid-feedback">{{ t('net_worth_loans_must_be_positive', default='Loans must be positive') }}</div>
+                                    <div class="form-text">{{ t('net_worth_loans_tooltip', default='Money borrowed from friends, banks, colleagues, or mobile money') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    {{ t('net_worth_calculation_info', default='Your Net Worth = Total Assets - Total Liabilities') }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-calculator"></i> {{ t('net_worth_calculate_net_worth', default='Calculate Net Worth') }}
+                </button>
+            </form>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div class="tab-pane fade" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+            {% if latest_record %}
+                <!-- Summary Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h6>{{ t('net_worth_total_assets', default='Total Assets') }}</h6>
+                                <h3>{{ latest_record.total_assets | format_currency }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-danger text-white">
+                            <div class="card-body text-center">
+                                <h6>{{ t('net_worth_total_liabilities', default='Total Liabilities') }}</h6>
+                                <h3>{{ latest_record.total_liabilities | format_currency }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-{{ 'success' if latest_record.net_worth >= 0 else 'warning' }} text-white">
+                            <div class="card-body text-center">
+                                <h6>{{ t('net_worth_net_worth', default='Net Worth') }}</h6>
+                                <h3>{{ latest_record.net_worth | format_currency }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Net Worth Chart -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-bar"></i> {{ t('net_worth_net_worth_metrics', default='Net Worth Metrics') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="netWorthChart" style="max-height: 400px;"></canvas>
+                    </div>
+                </div>
+
+                <!-- Detailed Breakdown -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6><i class="fas fa-plus-circle text-success"></i> {{ t('net_worth_assets_breakdown', default='Assets Breakdown') }}</h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>{{ t('net_worth_cash_and_savings', default='Cash & Savings') }}</span>
+                                        <strong>{{ latest_record.cash_savings | format_currency }}</strong>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>{{ t('net_worth_investments', default='Investments') }}</span>
+                                        <strong>{{ latest_record.investments | format_currency }}</strong>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>{{ t('net_worth_physical_property', default='Physical Property') }}</span>
+                                        <strong>{{ latest_record.property | format_currency }}</strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6><i class="fas fa-trophy"></i> {{ t('net_worth_badges', default='Badges') }}</h6>
+                            </div>
+                            <div class="card-body">
+                                {% if latest_record.badges %}
+                                    {% for badge in latest_record.badges %}
+                                        <span class="badge bg-success me-1 mb-1">{{ badge }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-muted">{{ t('net_worth_no_badges_earned_yet', default='No badges earned yet') }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insights and Tips -->
+                {% if insights %}
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h6><i class="fas fa-lightbulb"></i> {{ t('net_worth_insights', default='Insights') }}</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                {% for insight in insights %}
+                                    <li><i class="fas fa-check-circle text-success"></i> {{ insight }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if tips %}
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h6><i class="fas fa-rocket"></i> {{ t('net_worth_tips_for_improving_net_worth', default='Tips for Improving Net Worth') }}</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                {% for tip in tips %}
+                                    <li><i class="fas fa-arrow-up text-primary"></i> {{ tip }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Previous Assessments -->
+                {% if records %}
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h6><i class="fas fa-history"></i> {{ t('net_worth_previous_assessments', default='Previous Assessments') }}</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ t('general_date', default='Date') }}</th>
+                                            <th>{{ t('net_worth_net_worth', default='Net Worth') }}</th>
+                                            <th>{{ t('net_worth_total_assets', default='Assets') }}</th>
+                                            <th>{{ t('net_worth_total_liabilities', default='Liabilities') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for record_id, record in records %}
+                                            <tr>
+                                                <td>{{ record.created_at | format_datetime }}</td>
+                                                <td class="{% if record.net_worth >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                                    {{ record.net_worth | format_currency }}
+                                                </td>
+                                                <td>{{ record.total_assets | format_currency }}</td>
+                                                <td>{{ record.total_liabilities | format_currency }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-balance-scale fa-3x mb-3 text-muted"></i>
+                        <p>{{ t('net_worth_no_net_worth_data_available', default='No net worth data available') }}</p>
+                        <p>{{ t('net_worth_complete_calculator', default='Complete the calculator to see your net worth summary.') }}</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Share Ficore Africa Section -->
+    {% if current_user.is_authenticated %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>{{ t('general_share_ficore', default='Share Ficore Africa with Friends') }}</h5>
+            </div>
+            <div class="card-body">
+                <p>{{ t('general_share_ficore_invite', default='Invite your friends to join Ficore Africa and manage their finances better!') }}</p>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="referralLink" value="{{ url_for('auth.signup', ref=current_user.referral_code, _external=True) }}" readonly>
+                    <button class="btn btn-primary" type="button" onclick="copyReferralLink()">{{ t('general_profile_copy_link', default='Copy') }}</button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Number formatting
+    document.querySelectorAll('.number-input').forEach(input => {
+        const formatNumber = (value) => {
+            const cleanValue = value.replace(/[^0-9.]/g, '');
+            if (!cleanValue) return '';
+            const num = parseFloat(cleanValue);
+            if (isNaN(num)) return '';
+            return num.toLocaleString('en-NG', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        };
+
+        input.addEventListener('input', (e) => {
+            let cleanValue = e.target.value.replace(/[^0-9.]/g, '');
+            const numValue = parseFloat(cleanValue) || 0;
+            if (numValue > 10000000000) {
+                cleanValue = '10000000000';
+                alert('{{ t('general_input_cannot_exceed_10_billion', default='Input cannot exceed ₦10 billion') }}');
+            }
+            input.value = formatNumber(cleanValue);
+        });
+
+        input.addEventListener('blur', () => {
+            if (input.value) {
+                input.value = formatNumber(input.value);
+            }
+        });
+    });
+
+    // Form submission
+    document.getElementById('netWorthForm').addEventListener('submit', (e) => {
+        const inputs = document.querySelectorAll('.number-input');
+        let valid = true;
+        inputs.forEach(input => {
+            const value = input.value.replace(/,/g, '');
+            if (!value || isNaN(parseFloat(value))) {
+                input.classList.add('is-invalid');
+                valid = false;
+            } else {
+                input.classList.remove('is-invalid');
+                input.value = parseFloat(value).toString();
+            }
+        });
+        if (!valid) {
+            e.preventDefault();
+            alert('{{ t('general_please_enter_valid_numbers', default='Please enter valid numbers') }}');
+        }
+    });
+
+    {% if latest_record %}
+    // Net Worth Chart
+    const ctx = document.getElementById('netWorthChart').getContext('2d');
+    const dataValues = [
+        {{ latest_record.total_assets | default(0) }},
+        {{ latest_record.total_liabilities | default(0) }},
+        {{ latest_record.net_worth | default(0) }}
+    ];
+    const maxValue = Math.max(...dataValues) * 1.2;
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [
+                '{{ t('net_worth_total_assets', default='Total Assets') }}',
+                '{{ t('net_worth_total_liabilities', default='Total Liabilities') }}',
+                '{{ t('net_worth_net_worth', default='Net Worth') }}'
+            ],
+            datasets: [{
+                label: '{{ t('net_worth_metrics', default='Metrics') }}',
+                data: dataValues,
+                backgroundColor: ['#4CAF50', '#EF5350', '#42A5F5'],
+                borderColor: ['#388E3C', '#D32F2F', '#0288D1'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    suggestedMax: maxValue > 0 ? maxValue : 1000,
+                    ticks: {
+                        callback: function(value) {
+                            return `₦${value.toLocaleString('en-NG')}`;
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ₦${context.parsed.y.toLocaleString('en-NG')}`;
+                        }
+                    }
+                },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: function(value) {
+                        return `₦${value.toLocaleString('en-NG')}`;
+                    },
+                    color: '#333',
+                    font: { size: 12, weight: 'bold' }
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false
+        },
+        plugins: [ChartDataLabels]
+    });
+    {% endif %}
+
+    // Copy referral link
+    window.copyReferralLink = function() {
+        const referralLink = document.getElementById('referralLink');
+        referralLink.select();
+        document.execCommand('copy');
+        alert('{{ t('general_profile_link_copied', default='Referral link copied to clipboard!') }}');
+    };
+});
+</script>
+{% endblock %}

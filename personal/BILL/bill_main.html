@@ -1,0 +1,401 @@
+{% extends 'personal/base.html' %}
+
+{% block title %}
+{{ t('bill_bill_planner', default='Bill Planner') }}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% set tool_name = 'bill_bill_planner' %}
+    {% set tool_icon = 'fa-file-invoice' %}
+    {% set subtitle = t('bill_manage_track_bills', default='Manage and track all your bills in one place') %}
+    {% include 'personal/GENERAL/tool_header.html' %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ t(message, default=message) | safe }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('general_close', default='Close') }}"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="billTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="add-bill-tab" data-bs-toggle="tab" data-bs-target="#add-bill" type="button" role="tab" aria-controls="add-bill" aria-selected="true">
+                <i class="fas fa-plus"></i> {{ t('bill_add_bill', default='Add Bill') }}
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="manage-bills-tab" data-bs-toggle="tab" data-bs-target="#manage-bills" type="button" role="tab" aria-controls="manage-bills" aria-selected="false">
+                <i class="fas fa-list"></i> {{ t('bill_manage_bills', default='Manage Bills') }}
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab" aria-controls="dashboard" aria-selected="false">
+                <i class="fas fa-tachometer-alt"></i> {{ t('bill_dashboard', default='Dashboard') }}
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="billTabContent">
+        <!-- Add Bill Tab -->
+        <div class="tab-pane fade show active" id="add-bill" role="tabpanel" aria-labelledby="add-bill-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-plus-circle"></i> {{ t('bill_add_new_bill', default='Add New Bill') }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('bill.main') }}" id="addBillForm" class="validate-form">
+                        {{ add_form.csrf_token }}
+                        <input type="hidden" name="action" value="add_bill">
+                        
+                        <!-- Basic Information Section -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="first_name" class="form-label">{{ t('general_first_name', default='First Name') }}</label>
+                                    {{ add_form.first_name(class="form-control", placeholder=t('general_first_name_placeholder', default='e.g., Chukwuma')) }}
+                                    <div class="invalid-feedback">{{ t('general_first_name_required', default='First name is required') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">{{ t('general_email', default='Email') }}</label>
+                                    {{ add_form.email(class="form-control", placeholder=t('general_email_placeholder', default='e.g., user@example.com')) }}
+                                    <div class="invalid-feedback">{{ t('general_email_required', default='Valid email is required') }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bill Details Section -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="bill_name" class="form-label">{{ t('bill_bill_name', default='Bill Name') }}</label>
+                                    {{ add_form.bill_name(class="form-control", placeholder=t('bill_bill_name_placeholder', default='e.g., NEPA, MTN Data, Ajo Contribution')) }}
+                                    <div class="invalid-feedback">{{ t('bill_bill_name_required', default='Bill name is required') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="amount" class="form-label">{{ t('bill_amount', default='Amount') }}</label>
+                                    {{ add_form.amount(class="form-control number-input", placeholder=t('bill_amount_placeholder', default='e.g., ₦5000')) }}
+                                    <div class="invalid-feedback">{{ t('bill_amount_required', default='Valid amount is required') }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="due_date" class="form-label">{{ t('bill_due_date', default='Due Date') }}</label>
+                                    {{ add_form.due_date(class="form-control", type="date") }}
+                                    <div class="invalid-feedback">{{ t('bill_due_date_required', default='Valid due date is required') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="frequency" class="form-label">{{ t('bill_frequency', default='Frequency') }}</label>
+                                    {{ add_form.frequency(class="form-select") }}
+                                    <div class="invalid-feedback">{{ t('bill_frequency_required', default='Frequency is required') }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">{{ t('bill_category', default='Category') }}</label>
+                                    {{ add_form.category(class="form-select") }}
+                                    <div class="invalid-feedback">{{ t('bill_category_required', default='Category is required') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">{{ t('bill_status', default='Status') }}</label>
+                                    {{ add_form.status(class="form-select") }}
+                                    <div class="invalid-feedback">{{ t('bill_status_required', default='Status is required') }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reminder Settings -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6>{{ t('bill_reminder_settings', default='Reminder Settings') }}</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3 form-check">
+                                    {{ add_form.send_email(class="form-check-input", id="send_email") }}
+                                    <label class="form-check-label" for="send_email">{{ t('bill_send_email', default='Send Email Reminders') }}</label>
+                                </div>
+                                <div class="mb-3" id="reminder_days_container" style="display: none;">
+                                    <label for="reminder_days" class="form-label">{{ t('bill_reminder_days', default='Reminder Days') }}</label>
+                                    {{ add_form.reminder_days(class="form-control", placeholder=t('bill_reminder_days_placeholder', default='e.g., 7')) }}
+                                    <div class="invalid-feedback">{{ t('bill_reminder_days_required', default='Valid number of days (1-30) is required') }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> {{ t('bill_save_bill', default='Save Bill') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Bills Tab -->
+        <div class="tab-pane fade" id="manage-bills" role="tabpanel" aria-labelledby="manage-bills-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-edit"></i> {{ t('bill_manage_bills', default='Manage Bills') }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if bills_data %}
+                        {% for bill_id, bill, form in bills_data %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ bill.bill_name }} ({{ bill.amount | format_currency }})</h6>
+                                    <form method="POST" action="{{ url_for('bill.main') }}" class="bill-edit-form">
+                                        {{ form.csrf_token }}
+                                        <input type="hidden" name="bill_id" value="{{ bill_id }}">
+                                        <input type="hidden" name="action" value="update_bill">
+                                        
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">{{ t('bill_frequency', default='Frequency') }}</label>
+                                                    {{ form.frequency(class="form-select") }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">{{ t('bill_category', default='Category') }}</label>
+                                                    {{ form.category(class="form-select") }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">{{ t('bill_status', default='Status') }}</label>
+                                                    {{ form.status(class="form-select") }}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    {{ form.send_email(class="form-check-input", id="send_email_" + bill_id) }}
+                                                    <label class="form-check-label" for="send_email_{{ bill_id }}">{{ t('bill_send_email', default='Send Email Reminders') }}</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="reminder-days-container" style="display: {{ 'block' if form.send_email.data else 'none' }};">
+                                                    <label class="form-label">{{ t('bill_reminder_days', default='Reminder Days') }}</label>
+                                                    {{ form.reminder_days(class="form-control") }}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-3">
+                                            <button type="submit" class="btn btn-success btn-sm">{{ t('general_update', default='Update') }}</button>
+                                            <button type="submit" name="action" value="delete_bill" class="btn btn-danger btn-sm" onclick="return confirm('{{ t('bill_confirm_delete', default='Are you sure you want to delete this bill?') }}');">{{ t('general_delete', default='Delete') }}</button>
+                                            <button type="submit" name="action" value="toggle_status" class="btn btn-secondary btn-sm">{{ t('bill_toggle_status', default='Toggle Status') }}</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center">
+                            <i class="fas fa-file-invoice fa-3x mb-3 text-muted"></i>
+                            <p>{{ t('bill_no_bills_empty_state', default='No bills added yet. Start by adding one!') }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div class="tab-pane fade" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-line"></i> {{ t('bill_dashboard', default='Bill Dashboard') }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if bills %}
+                        <!-- Summary Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body">
+                                        <h6>{{ t('bill_paid_count', default='Paid Bills') }}</h6>
+                                        <h4>{{ paid_count }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning text-white">
+                                    <div class="card-body">
+                                        <h6>{{ t('bill_pending_count', default='Pending Bills') }}</h6>
+                                        <h4>{{ pending_count }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-danger text-white">
+                                    <div class="card-body">
+                                        <h6>{{ t('bill_overdue_count', default='Overdue Bills') }}</h6>
+                                        <h4>{{ overdue_count }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body">
+                                        <h6>{{ t('bill_total_bills', default='Total Bills') }}</h6>
+                                        <h4>{{ total_bills | format_currency }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bills Table -->
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>{{ t('bill_bill_name', default='Bill Name') }}</th>
+                                        <th>{{ t('bill_amount', default='Amount') }}</th>
+                                        <th>{{ t('bill_due_date', default='Due Date') }}</th>
+                                        <th>{{ t('bill_category', default='Category') }}</th>
+                                        <th>{{ t('bill_status', default='Status') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for bill_id, bill in bills %}
+                                        <tr>
+                                            <td>{{ bill.bill_name }}</td>
+                                            <td>{{ bill.amount | format_currency }}</td>
+                                            <td>{{ bill.due_date }}</td>
+                                            <td>{{ t('bill_category_' + bill.category, default=bill.category) }}</td>
+                                            <td>
+                                                <span class="badge bg-{{ 'success' if bill.status == 'paid' else 'warning' if bill.status == 'pending' else 'danger' }}">
+                                                    {{ t('bill_status_' + bill.status, default=bill.status) }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center">
+                            <i class="fas fa-file-invoice fa-3x mb-3 text-muted"></i>
+                            <p>{{ t('bill_no_bills_empty_state', default='No bills added yet. Start by adding one!') }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Ficore Africa Section -->
+    {% if current_user.is_authenticated %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>{{ t('general_share_ficore', default='Share Ficore Africa with Friends') }}</h5>
+            </div>
+            <div class="card-body">
+                <p>{{ t('general_share_ficore_invite', default='Invite your friends to join Ficore Africa and manage their finances better!') }}</p>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="referralLink" value="{{ url_for('auth.signup', ref=current_user.referral_code, _external=True) }}" readonly>
+                    <button class="btn btn-primary" type="button" onclick="copyReferralLink()">{{ t('general_profile_copy_link', default='Copy') }}</button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Number formatting for amount inputs
+    function formatNumberInput(input) {
+        const format = (val) => {
+            let clean = val.replace(/[^0-9.]/g, '');
+            if (!clean) return '';
+            let parts = clean.split('.');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return parts.join('.');
+        };
+        
+        input.addEventListener('input', function(e) {
+            let cursor = input.selectionStart;
+            let oldLength = input.value.length;
+            input.value = format(input.value);
+            let newLength = input.value.length;
+            input.setSelectionRange(cursor + (newLength - oldLength), cursor + (newLength - oldLength));
+        });
+    }
+
+    // Apply number formatting to amount inputs
+    document.querySelectorAll('.number-input').forEach(formatNumberInput);
+
+    // Handle reminder email toggle
+    const sendEmailCheckbox = document.getElementById('send_email');
+    const reminderDaysContainer = document.getElementById('reminder_days_container');
+    
+    if (sendEmailCheckbox && reminderDaysContainer) {
+        sendEmailCheckbox.addEventListener('change', function() {
+            reminderDaysContainer.style.display = this.checked ? 'block' : 'none';
+        });
+    }
+
+    // Handle reminder toggles for existing bills
+    document.querySelectorAll('[id^="send_email_"]').forEach(checkbox => {
+        const billId = checkbox.id.replace('send_email_', '');
+        const container = checkbox.closest('.card-body').querySelector('.reminder-days-container');
+        
+        checkbox.addEventListener('change', function() {
+            if (container) {
+                container.style.display = this.checked ? 'block' : 'none';
+            }
+        });
+    });
+
+    // Form submission handling
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function() {
+            // Strip commas from number inputs before submission
+            form.querySelectorAll('.number-input').forEach(input => {
+                if (input.value) {
+                    input.value = input.value.replace(/,/g, '');
+                }
+            });
+        });
+    });
+
+    // Copy referral link function
+    window.copyReferralLink = function() {
+        const referralLink = document.getElementById('referralLink');
+        referralLink.select();
+        document.execCommand('copy');
+        alert('{{ t('general_profile_link_copied', default='Referral link copied to clipboard!') }}');
+    };
+
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

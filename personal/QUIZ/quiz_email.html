@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="{{ lang | default('en') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('quiz_report_subject', default='Your Financial Personality Quiz Results') }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .header {
+            background: linear-gradient(135deg, #2E7D32, #0288D1);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            padding: 20px;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+        }
+        a {
+            color: #0288D1;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #2E7D32, #0288D1);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .btn:hover {
+            background: linear-gradient(135deg, #1B5E20, #01579B);
+        }
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .metrics-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .metrics-table .label {
+            font-weight: bold;
+            width: 50%;
+        }
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            margin: 5px;
+            border-radius: 12px;
+            font-size: 0.875em;
+            color: white;
+        }
+        .bg-primary {
+            background-color: #0288D1;
+            border: 2px solid #01579B;
+        }
+        .bg-success {
+            background-color: #2E7D32;
+            border: 2px solid #1B5E20;
+        }
+        .bg-info {
+            background-color: #17A2B8;
+            border: 2px solid #117A8B;
+        }
+        h2 {
+            color: #2E7D32;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        @media only screen and (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 10px;
+            }
+            .btn {
+                display: block;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{{ t('quiz_financial_personality_quiz', default='Financial Personality Quiz') }}</h1>
+        </div>
+        <div class="content">
+            <p>{{ t('general_dear', default='Dear') }} {{ data.first_name | default(t('general_user', default='User')) }},</p>
+            <p>{{ t('quiz_quiz_summary_intro', default='Thank you for completing the Financial Personality Quiz. Below are your personalized results.') }}</p>
+            
+            <h2>{{ t('quiz_your_financial_personality_results', default='Your Financial Personality Results') }}</h2>
+            <table class="metrics-table">
+                <tr>
+                    <td class="label">{{ t('general_created_at', default='Created At') }}</td>
+                    <td>{{ data.created_at }}</td>
+                </tr>
+                <tr>
+                    <td class="label">{{ t('quiz_your_personality', default='Your Personality') }}</td>
+                    <td>{{ t('quiz_' + data.personality.lower() + '_description', default=data.personality) }}</td>
+                </tr>
+                <tr>
+                    <td class="label">{{ t('quiz_score', default='Score') }}</td>
+                    <td>{{ data.score }} / 30</td>
+                </tr>
+            </table>
+
+            <h2>{{ t('quiz_badges', default='Badges') }}</h2>
+            {% if data.badges %}
+                <div>
+                    {% for badge in data.badges %}
+                        <span class="badge {{ badge.color_class }}">{{ t('quiz_badge_' + badge.name.lower().replace(' ', '_'), default=badge.name) }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>{{ t('quiz_no_badges', default='No badges earned yet.') }}</p>
+            {% endif %}
+
+            <h2>{{ t('quiz_insights', default='Insights') }}</h2>
+            <ul>
+                {% if data.insights %}
+                    {% for insight in data.insights %}
+                        <li>{{ insight }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li>{{ t('quiz_no_insights', default='No specific insights available.') }}</li>
+                {% endif %}
+            </ul>
+
+            <h2>{{ t('quiz_tips_for_improving_financial_habits', default='Tips for Improving Financial Habits') }}</h2>
+            <ul>
+                {% if data.tips %}
+                    {% for tip in data.tips %}
+                        <li>{{ tip }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li>{{ t('quiz_review_goals', default='Review your financial goals regularly to stay on track.') }}</li>
+                {% endif %}
+                {% if data.personality in ['Spender', 'Balanced', 'Avoider'] %}
+                    <li>{{ t('quiz_use_budgeting_app', default='Use a budgeting app to track and manage your expenses.') }}</li>
+                {% endif %}
+                {% if data.personality != 'Saver' %}
+                    <li>{{ t('quiz_set_emergency_fund', default='Start building an emergency fund for unexpected expenses.') }}</li>
+                {% endif %}
+            </ul>
+
+            <p>
+                <a href="{{ data.cta_url }}" class="btn">{{ t('quiz_view_dashboard', default='View Your Results') }}</a>
+            </p>
+            <p>{{ t('general_thank_you', default='Thank you for using FiCore Africa!') }}</p>
+        </div>
+        <div class="footer">
+            <p>{{ t('general_powered_by', default='Powered by FiCore Africa') }}</p>
+        </div>
+    </div>
+</body>
+</html>

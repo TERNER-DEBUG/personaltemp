@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="{{ lang | default('en') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('quiz_report_subject', default='Your Financial Personality Quiz Results') }}</title>
+</head>
+<body style="font-family: Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f8f9fa;">
+    <div style="max-width: 600px; margin: 20px auto; background: #ffffff; border: 1px solid #dddddd; border-radius: 8px;">
+        <div style="background: #2E7D32; color: #ffffff; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h1 style="margin: 0; font-size: 24px;">{{ t('quiz_financial_personality_quiz', default='Financial Personality Quiz') }}</h1>
+        </div>
+        <div style="padding: 20px;">
+            <p style="margin: 0 0 10px;">{{ t('general_dear', default='Dear') }} {{ data.first_name | default(t('general_user', default='User')) }},</p>
+            <p style="margin: 0 0 20px;">{{ t('quiz_quiz_summary_intro', default='Thank you for completing the Financial Personality Quiz. Below are your personalized results.') }}</p>
+            
+            <h2 style="color: #2E7D32; font-size: 20px; margin: 20px 0 10px;">{{ t('quiz_your_financial_personality_results', default='Your Financial Personality Results') }}</h2>
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #dddddd; font-weight: bold; width: 50%;">{{ t('general_created_at', default='Created At') }}</td>
+                    <td style="padding: 10px; border: 1px solid #dddddd;">{{ data.created_at }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #dddddd; font-weight: bold;">{{ t('quiz_your_personality', default='Your Personality') }}</td>
+                    <td style="padding: 10px; border: 1px solid #dddddd;">{{ t('quiz_' + data.personality.lower() + '_description', default=data.personality) }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #dddddd; font-weight: bold;">{{ t('quiz_score', default='Score') }}</td>
+                    <td style="padding: 10px; border: 1px solid #dddddd;">{{ data.score }} / 30</td>
+                </tr>
+            </table>
+
+            <h2 style="color: #2E7D32; font-size: 20px; margin: 20px 0 10px;">{{ t('quiz_badges', default='Badges') }}</h2>
+            {% if data.badges %}
+                <div style="margin: 10px 0;">
+                    {% for badge in data.badges %}
+                        <span style="display: inline-block; padding: 5px 12px; margin: 5px; border-radius: 12px; font-size: 14px; color: #ffffff; {% if badge.color_class == 'bg-primary' %}background-color: #0288D1; border: 2px solid #01579B;{% elif badge.color_class == 'bg-success' %}background-color: #2E7D32; border: 2px solid #1B5E20;{% elif badge.color_class == 'bg-info' %}background-color: #17A2B8; border: 2px solid #117A8B;{% endif %}">
+                            {{ t('quiz_badge_' + badge.name.lower().replace(' ', '_'), default=badge.name) }}
+                        </span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="margin: 0 0 10px;">{{ t('quiz_no_badges', default='No badges earned yet.') }}</p>
+            {% endif %}
+
+            <h2 style="color: #2E7D32; font-size: 20px; margin: 20px 0 10px;">{{ t('quiz_insights', default='Insights') }}</h2>
+            <ul style="padding-left: 20px; margin: 0 0 20px;">
+                {% if data.insights %}
+                    {% for insight in data.insights %}
+                        <li style="margin-bottom: 10px;">{{ insight }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li style="margin-bottom: 10px;">{{ t('quiz_no_insights', default='No specific insights available.') }}</li>
+                {% endif %}
+            </ul>
+
+            <h2 style="color: #2E7D32; font-size: 20px; margin: 20px 0 10px;">{{ t('quiz_tips_for_improving_financial_habits', default='Tips for Improving Financial Habits') }}</h2>
+            <ul style="padding-left: 20px; margin: 0 0 20px;">
+                {% if data.tips %}
+                    {% for tip in data.tips %}
+                        <li style="margin-bottom: 10px;">{{ tip }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li style="margin-bottom: 10px;">{{ t('quiz_review_goals', default='Review your financial goals regularly to stay on track.') }}</li>
+                {% endif %}
+                {% if data.personality in ['Spender', 'Balanced', 'Avoider'] %}
+                    <li style="margin-bottom: 10px;">{{ t('quiz_use_budgeting_app', default='Use a budgeting app to track and manage your expenses.') }}</li>
+                {% endif %}
+                {% if data.personality != 'Saver' %}
+                    <li style="margin-bottom: 10px;">{{ t('quiz_set_emergency_fund', default='Start building an emergency fund for unexpected expenses.') }}</li>
+                {% endif %}
+            </ul>
+
+            <p style="margin: 0 0 20px; text-align: center;">
+                <a href="{{ data.cta_url }}" style="display: inline-block; padding: 12px 24px; background: #2E7D32; color: #ffffff; text-decoration: none; border-radius: 5px; font-size: 16px;">{{ t('quiz_view_dashboard', default='View Your Results') }}</a>
+            </p>
+            <p style="margin: 0 0 20px;">{{ t('general_thank_you', default='Thank you for using FiCore Africa!') }}</p>
+        </div>
+        <div style="text-align: center; font-size: 12px; color: #777777; padding: 10px; border-top: 1px solid #dddddd;">
+            <p style="margin: 0;">{{ t('general_powered_by', default='Powered by FiCore Africa') }}</p>
+        </div>
+    </div>
+</body>
+</html>

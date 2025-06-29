@@ -1,0 +1,326 @@
+{% extends "personal/base.html" %}
+{% block title %}{{ t('emergency_fund_calculator', default='Emergency Fund Calculator') }}{% endblock %}
+{% block content %}
+<div class="container">
+    {% set tool_name = 'emergency_fund_calculator' %}
+    {% set tool_icon = 'fa-piggy-bank' %}
+    {% set subtitle = t('emergency_fund_plan_savings', default='Plan your emergency savings effectively') %}
+    {% include 'personal/GENERAL/tool_header.html' %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ t(message, default=message) }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('general_close', default='Close') }}"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="emergencyFundTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="create-plan-tab" data-bs-toggle="tab" data-bs-target="#create-plan" type="button" role="tab" aria-controls="create-plan" aria-selected="true">
+                <i class="fas fa-plus"></i> {{ t('emergency_fund_create_plan', default='Create Plan') }}
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab" aria-controls="dashboard" aria-selected="false">
+                <i class="fas fa-chart-line"></i> {{ t('emergency_fund_dashboard', default='Dashboard') }}
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="emergencyFundTabContent">
+        <!-- Create Plan Tab -->
+        <div class="tab-pane fade show active" id="create-plan" role="tabpanel" aria-labelledby="create-plan-tab">
+            <form method="POST" action="{{ url_for('emergency_fund.main') }}" id="emergencyFundForm" class="validate-form">
+                {{ form.csrf_token }}
+                <input type="hidden" name="action" value="create_plan">
+
+                <!-- Personal Information -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-user"></i> {{ t('emergency_fund_personal_info', default='Personal Information') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('emergency_fund_first_name', default='First Name') }}</label>
+                                    {{ form.first_name(class="form-control", placeholder=t('emergency_fund_first_name_placeholder', default='e.g., Chukwudi, Aisha')) }}
+                                    <div class="invalid-feedback">{{ t('emergency_fund_first_name_required', default='First name is required') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('emergency_fund_email', default='Email') }}</label>
+                                    {{ form.email(class="form-control", placeholder=t('emergency_fund_email_placeholder', default='e.g., aisha@example.com')) }}
+                                    <div class="invalid-feedback">{{ t('emergency_fund_email_required', default='Valid email is required') }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            {{ form.email_opt_in(class="form-check-input") }}
+                            <label class="form-check-label">{{ t('emergency_fund_send_email', default='Send me my plan by email') }}</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Income & Expenses -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-money-bill-wave"></i> {{ t('emergency_fund_income_expenses', default='Income & Expenses') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('emergency_fund_monthly_expenses', default='Monthly Expenses') }}</label>
+                                    {{ form.monthly_expenses(class="form-control number-input", placeholder=t('emergency_fund_monthly_expenses_placeholder', default='e.g., 30,000')) }}
+                                    <div class="invalid-feedback">{{ t('emergency_fund_monthly_expenses_required', default='Monthly expenses are required') }}</div>
+                                    <div class="form-text">{{ t('emergency_fund_monthly_expenses_example', default='Example: ₦30,000 for food, transport, and data') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('emergency_fund_monthly_income', default='Monthly Income (Optional)') }}</label>
+                                    {{ form.monthly_income(class="form-control number-input", placeholder=t('emergency_fund_monthly_income_placeholder', default='e.g., 50,000')) }}
+                                    <div class="form-text">{{ t('emergency_fund_monthly_income_example', default='Example: ₦50,000 from salary or business') }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Savings & Risk -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-shield-alt"></i> {{ t('emergency_fund_savings_risk', default='Savings & Risk Assessment') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('emergency_fund_current_savings', default='Current Savings') }}</label>
+                                    {{ form.current_savings(class="form-control number-input", placeholder=t('emergency_fund_current_savings_placeholder', default='e.g., 20,000')) }}
+                                    <div class="invalid-feedback">{{ t('emergency_fund_current_savings_required', default='Current savings amount is required') }}</div>
+                                    <div class="form-text">{{ t('emergency_fund_current_savings_example', default='Example: ₦20,000 in your Ajo savings') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('emergency_fund_risk_tolerance_level', default='Risk Level') }}</label>
+                                    {{ form.risk_tolerance_level(class="form-select") }}
+                                    <div class="invalid-feedback">{{ t('emergency_fund_risk_tolerance_required', default='Risk level is required') }}</div>
+                                    <div class="form-text">{{ t('emergency_fund_risk_tolerance_level_example', default='Example: Choose "Low" if your job is not steady') }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('emergency_fund_dependents', default='Number of Dependents') }}</label>
+                                    {{ form.dependents(class="form-control number-input", placeholder=t('emergency_fund_dependents_placeholder', default='e.g., 3')) }}
+                                    <div class="invalid-feedback">{{ t('emergency_fund_dependents_required', default='Number of dependents is required') }}</div>
+                                    <div class="form-text">{{ t('emergency_fund_dependents_example', default='Example: 3 for your two kids and one parent') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('emergency_fund_timeline', default='Savings Timeline') }}</label>
+                                    {{ form.timeline(class="form-select") }}
+                                    <div class="invalid-feedback">{{ t('emergency_fund_timeline_required', default='Timeline is required') }}</div>
+                                    <div class="form-text">{{ t('emergency_fund_timeline_example', default='Example: Choose 6 months to save quickly') }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-calculator"></i> {{ t('emergency_fund_calculate_button', default='Calculate Emergency Fund') }}
+                </button>
+            </form>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div class="tab-pane fade" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-piggy-bank"></i> {{ t('emergency_fund_latest_plan', default='Your Latest Plan') }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if latest_record %}
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <h6>{{ t('emergency_fund_target_amount', default='Target Amount') }}</h6>
+                                        <h4>{{ latest_record.get('target_amount', 0) | format_currency }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-warning text-white">
+                                    <div class="card-body text-center">
+                                        <h6>{{ t('emergency_fund_current_savings', default='Current Savings') }}</h6>
+                                        <h4>{{ latest_record.get('current_savings', 0) | format_currency }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body text-center">
+                                        <h6>{{ t('emergency_fund_savings_gap', default='Savings Gap') }}</h6>
+                                        <h4>{{ latest_record.get('savings_gap', 0) | format_currency }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>{{ t('emergency_fund_plan_details', default='Plan Details') }}</h6>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>{{ t('emergency_fund_monthly_expenses', default='Monthly Expenses') }}</span>
+                                        <strong>{{ latest_record.get('monthly_expenses', 0) | format_currency }}</strong>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>{{ t('emergency_fund_recommended_months', default='Recommended Months') }}</span>
+                                        <strong>{{ latest_record.get('recommended_months', 0) }} {{ t('general_months', default='months') }}</strong>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>{{ t('emergency_fund_monthly_savings', default='Monthly Savings Needed') }}</span>
+                                        <strong>{{ latest_record.get('monthly_savings', 0) | format_currency }}</strong>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>{{ t('emergency_fund_timeline', default='Timeline') }}</span>
+                                        <strong>{{ latest_record.get('timeline', 0) }} {{ t('general_months', default='months') }}</strong>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>{{ t('emergency_fund_badges', default='Achievements') }}</h6>
+                                {% if latest_record.get('badges') %}
+                                    {% for badge in latest_record['badges'] %}
+                                        <span class="badge bg-success me-1 mb-1">{{ badge }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-muted">{{ t('emergency_fund_no_badges', default='No badges earned yet') }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if insights %}
+                            <div class="mt-4">
+                                <h6>{{ t('emergency_fund_insights', default='Insights') }}</h6>
+                                <ul class="list-unstyled">
+                                    {% for insight in insights %}
+                                        <li><i class="fas fa-lightbulb text-warning"></i> {{ insight }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        {% if tips %}
+                            <div class="mt-4">
+                                <h6>{{ t('emergency_fund_tips', default='Tips to Build Your Fund') }}</h6>
+                                <ul class="list-unstyled">
+                                    {% for tip in tips %}
+                                        <li><i class="fas fa-check-circle text-success"></i> {{ tip }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center">
+                            <i class="fas fa-piggy-bank fa-3x mb-3 text-muted"></i>
+                            <p>{{ t('emergency_fund_no_data', default='No emergency fund plan found. Start a new plan to see your summary.') }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Ficore Africa Section -->
+    {% if current_user.is_authenticated %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>{{ t('general_share_ficore', default='Share Ficore Africa with Friends') }}</h5>
+            </div>
+            <div class="card-body">
+                <p>{{ t('general_share_ficore_invite', default='Invite your friends to join Ficore Africa and manage their finances better!') }}</p>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="referralLink" value="{{ url_for('auth.signup', ref=current_user.referral_code, _external=True) }}" readonly>
+                    <button class="btn btn-primary" type="button" onclick="copyReferralLink()">{{ t('general_profile_copy_link', default='Copy') }}</button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Number formatting
+    document.querySelectorAll('.number-input').forEach(input => {
+        input.addEventListener('input', () => {
+            let value = input.value.replace(/,/g, '');
+            if (!value) return;
+            
+            if (input.id === 'dependents' && parseInt(value) > 100) {
+                value = '100';
+                alert('{{ t('emergency_fund_dependents_max', default='Number of dependents cannot exceed 100') }}');
+            } else if (parseFloat(value) > 10000000000) {
+                value = '10000000000';
+                alert('{{ t('general_input_cannot_exceed_10_billion', default='Input cannot exceed ₦10 billion') }}');
+            }
+            
+            input.value = parseFloat(value).toLocaleString('en-NG', { maximumFractionDigits: 0 });
+        });
+
+        input.addEventListener('paste', (e) => {
+            e.preventDefault();
+            let pasted = (e.clipboardData || window.clipboardData).getData('text');
+            let clean = pasted.replace(/[^0-9.]/g, '');
+            input.value = parseFloat(clean).toLocaleString('en-NG', { maximumFractionDigits: 0 });
+        });
+
+        input.addEventListener('blur', () => {
+            if (input.value) {
+                input.value = parseFloat(input.value.replace(/,/g, '')).toLocaleString('en-NG', { maximumFractionDigits: 0 });
+            }
+        });
+    });
+
+    // Form submission
+    document.getElementById('emergencyFundForm').addEventListener('submit', function() {
+        document.querySelectorAll('.number-input').forEach(function(input) {
+            if (input.value) {
+                input.value = input.value.replace(/,/g, '');
+            }
+        });
+    });
+
+    // Copy referral link
+    window.copyReferralLink = function() {
+        const referralLink = document.getElementById('referralLink');
+        referralLink.select();
+        document.execCommand('copy');
+        alert('{{ t('general_profile_link_copied', default='Referral link copied to clipboard!') }}');
+    };
+
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

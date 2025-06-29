@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}{{ t('general_feedback_page_title', default='Provide Feedback') }}{% endblock %}
+{% block content %}
+<div class="tool-header">
+  <div class="tool-header-container">
+    <h2 class="tool-title">
+      {{ t('general_feedback_page_title', default='Provide Feedback') }}
+    </h2>
+  </div>
+</div>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">{{ t('general_feedback_page_title', default='Provide Feedback') }}</h1>
+    <p class="text-center mb-5">{{ t('general_feedback_page_description', default='We value your input! Choose how you'd like to share your feedback below.') }}</p>
+
+    <div class="row">
+        <!-- New Feedback Form -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">{{ t('general_feedback_new_form', default='Feedback (new)') }}</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ t('general_feedback_new_description', default='Use our new feedback form to share your thoughts on specific tools.') }}</p>
+                    <form action="{{ url_for('feedback') }}" method="POST" class="validate-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label for="tool_name" class="form-label">{{ t('general_feedback_tool_label', default='Tool') }} <span class="text-danger">*</span></label>
+                            <select id="tool_name" name="tool_name" class="form-select" required>
+                                <option value="" disabled selected>{{ t('general_feedback_select_tool', default='Select a tool') }}</option>
+                                {% for tool in tool_options %}
+                                <option value="{{ tool }}">{{ t('general_tool_' + tool, default=tool.replace('_', ' ').title()) }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="rating" class="form-label">{{ t('general_feedback_rating_label', default='Rating') }} <span class="text-danger">*</span></label>
+                            <select id="rating" name="rating" class="form-select" required>
+                                <option value="" disabled selected>{{ t('general_feedback_select_rating', default='Select a rating (1-5)') }}</option>
+                                <option value="1">1 - {{ t('general_feedback_poor', default='Poor') }}</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5 - {{ t('general_feedback_excellent', default='Excellent') }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">{{ t('general_feedback_comment_label', default='Comment') }}</label>
+                            <textarea id="comment" name="comment" class="form-control" rows="4" placeholder="{{ t('general_feedback_comment_placeholder', default='Your feedback (optional)') }}"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">{{ t('general_feedback_submit', default='Submit Feedback') }}</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legacy Google Form -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">{{ t('general_feedback_legacy_form', default='Legacy Google Form') }}</h5>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <p>{{ t('general_feedback_legacy_description', default='Use our previous Google Form for general feedback.') }}</p>
+                    <a href="{{ FEEDBACK_FORM_URL }}" target="_blank" class="btn btn-secondary mt-auto">{{ t('general_feedback_open_google_form', default='Open Google Form') }}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

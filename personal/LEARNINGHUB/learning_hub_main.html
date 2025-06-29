@@ -1,0 +1,369 @@
+{% extends "personal/base.html" %}
+{% block title %}{{ t('learning_hub_courses', default='Learning Hub') }}{% endblock %}
+{% block extra_head %}
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    {% set tool_name = 'learning_hub_courses' %}
+    {% set tool_icon = 'fa-graduation-cap' %}
+    {% set subtitle = t('learning_hub_improve_financial_literacy', default='Improve your financial literacy with our courses') %}
+    {% include 'personal/GENERAL/tool_header.html' %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ t(message, default=message) }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('general_close', default='Close') }}"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="learningTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="courses-tab" data-bs-toggle="tab" data-bs-target="#courses" type="button" role="tab" aria-controls="courses" aria-selected="true">
+                <i class="fas fa-book"></i> {{ t('learning_hub_courses', default='Courses') }}
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="progress-tab" data-bs-toggle="tab" data-bs-target="#progress" type="button" role="tab" aria-controls="progress" aria-selected="false">
+                <i class="fas fa-chart-line"></i> {{ t('learning_hub_my_progress', default='My Progress') }}
+            </button>
+        </li>
+        {% if current_user.is_authenticated and current_user.get('is_admin', False) %}
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload" type="button" role="tab" aria-controls="upload" aria-selected="false">
+                <i class="fas fa-upload"></i> {{ t('learning_hub_upload_content', default='Upload Content') }}
+            </button>
+        </li>
+        {% endif %}
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="learningTabContent">
+        <!-- Courses Tab -->
+        <div class="tab-pane fade show active" id="courses" role="tabpanel" aria-labelledby="courses-tab">
+            {% if courses %}
+                <div class="row">
+                    {% for course in courses %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 course-card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-book-open"></i>
+                                        {{ t(course.title_key, default=course.title_en) }}
+                                    </h5>
+                                    {% if course.is_premium %}
+                                        <span class="badge bg-warning">{{ t('learning_hub_premium', default='Premium') }}</span>
+                                    {% else %}
+                                        <span class="badge bg-success">{{ t('learning_hub_free', default='Free') }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">{{ t(course.description_key, default=course.description_en) }}</p>
+                                    
+                                    {% if course.lessons %}
+                                        <div class="mb-3">
+                                            <small class="text-muted">
+                                                <i class="fas fa-list"></i>
+                                                {{ course.lessons | length }} {{ t('learning_hub_lessons', default='lessons') }}
+                                            </small>
+                                        </div>
+                                        
+                                        <!-- Progress bar if user has started -->
+                                        {% if current_user.is_authenticated %}
+                                            {% set user_progress = user_progress_data.get(course.id, {}) %}
+                                            {% if user_progress.get('lessons_completed') %}
+                                                {% set progress_percent = (user_progress.lessons_completed | length / course.lessons | length * 100) | round %}
+                                                <div class="progress mb-3">
+                                                    <div class="progress-bar" role="progressbar" style="width: {{ progress_percent }}%" aria-valuenow="{{ progress_percent }}" aria-valuemin="0" aria-valuemax="100">
+                                                        {{ progress_percent }}%
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted">
+                                                    {{ user_progress.lessons_completed | length }} / {{ course.lessons | length }} {{ t('learning_hub_completed', default='completed') }}
+                                                </small>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer">
+                                    <a href="{{ url_for('learning_hub.course_overview', course_id=course.id) }}" class="btn btn-primary">
+                                        {% if current_user.is_authenticated and user_progress_data.get(course.id, {}).get('lessons_completed') %}
+                                            <i class="fas fa-play"></i> {{ t('learning_hub_continue', default='Continue') }}
+                                        {% else %}
+                                            <i class="fas fa-play"></i> {{ t('learning_hub_start', default='Start') }}
+                                        {% endif %}
+                                    </a>
+                                    <a href="{{ url_for('learning_hub.course_overview', course_id=course.id) }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-info-circle"></i> {{ t('learning_hub_details', default='Details') }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-book fa-3x mb-3 text-muted"></i>
+                        <h5>{{ t('learning_hub_no_courses', default='No courses available') }}</h5>
+                        <p>{{ t('learning_hub_check_back_later', default='Check back later for new courses!') }}</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Progress Tab -->
+        <div class="tab-pane fade" id="progress" role="tabpanel" aria-labelledby="progress-tab">
+            {% if current_user.is_authenticated %}
+                {% if user_progress_data %}
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <h6>{{ t('learning_hub_courses_started', default='Courses Started') }}</h6>
+                                    <h3>{{ user_progress_data | length }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h6>{{ t('learning_hub_lessons_completed', default='Lessons Completed') }}</h6>
+                                    <h3>{{ total_lessons_completed }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h6>{{ t('learning_hub_certificates_earned', default='Certificates Earned') }}</h6>
+                                    <h3>{{ certificates_earned }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Chart -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-bar"></i> {{ t('learning_hub_learning_progress', default='Learning Progress') }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="progressChart" style="max-height: 400px;"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Course Progress Details -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-list"></i> {{ t('learning_hub_course_progress', default='Course Progress') }}</h5>
+                        </div>
+                        <div class="card-body">
+                            {% for course_id, progress in user_progress_data.items() %}
+                                {% set course = courses | selectattr('id', 'equalto', course_id) | first %}
+                                {% if course %}
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="mb-0">{{ t(course.title_key, default=course.title_en) }}</h6>
+                                            <small class="text-muted">
+                                                {{ progress.lessons_completed | length }} / {{ course.lessons | length }} {{ t('learning_hub_lessons', default='lessons') }}
+                                            </small>
+                                        </div>
+                                        {% set progress_percent = (progress.lessons_completed | length / course.lessons | length * 100) | round %}
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" style="width: {{ progress_percent }}%" aria-valuenow="{{ progress_percent }}" aria-valuemin="0" aria-valuemax="100">
+                                                {{ progress_percent }}%
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <a href="{{ url_for('learning_hub.course_overview', course_id=course.id) }}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-play"></i> {{ t('learning_hub_continue', default='Continue') }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-chart-line fa-3x mb-3 text-muted"></i>
+                            <h5>{{ t('learning_hub_no_progress', default='No learning progress yet') }}</h5>
+                            <p>{{ t('learning_hub_start_course_to_track', default='Start a course to track your progress!') }}</p>
+                            <a href="#courses" class="btn btn-primary" onclick="document.getElementById('courses-tab').click()">
+                                <i class="fas fa-book"></i> {{ t('learning_hub_browse_courses', default='Browse Courses') }}
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-lock fa-3x mb-3 text-muted"></i>
+                        <h5>{{ t('learning_hub_login_required', default='Login Required') }}</h5>
+                        <p>{{ t('learning_hub_login_to_track_progress', default='Please log in to track your learning progress.') }}</p>
+                        <a href="{{ url_for('auth.signin') }}" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> {{ t('general_login', default='Login') }}
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Upload Content Tab (Admin Only) -->
+        {% if current_user.is_authenticated and current_user.get('is_admin', False) %}
+        <div class="tab-pane fade" id="upload" role="tabpanel" aria-labelledby="upload-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-upload"></i> {{ t('learning_hub_upload_content', default='Upload Learning Content') }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('learning_hub.upload_content') }}" enctype="multipart/form-data" class="validate-form">
+                        {{ upload_form.csrf_token }}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('learning_hub_course_title', default='Course Title') }}</label>
+                                    {{ upload_form.title(class="form-control", placeholder=t('learning_hub_course_title_placeholder', default='e.g., Budgeting Basics')) }}
+                                    <div class="invalid-feedback">{{ t('learning_hub_course_title_required', default='Course title is required') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('learning_hub_course_id', default='Course ID') }}</label>
+                                    {{ upload_form.course_id(class="form-control", placeholder=t('learning_hub_course_id_placeholder', default='e.g., budgeting_101')) }}
+                                    <div class="invalid-feedback">{{ t('learning_hub_course_id_required', default='Course ID is required') }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ t('learning_hub_description', default='Description') }}</label>
+                            {{ upload_form.description(class="form-control", rows="3", placeholder=t('learning_hub_description_placeholder', default='Brief description of the course')) }}
+                            <div class="invalid-feedback">{{ t('learning_hub_description_required', default='Description is required') }}</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('learning_hub_content_type', default='Content Type') }}</label>
+                                    {{ upload_form.content_type(class="form-select") }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 form-check mt-4">
+                                    {{ upload_form.is_premium(class="form-check-input") }}
+                                    <label class="form-check-label">{{ t('learning_hub_is_premium', default='Premium Content') }}</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ t('learning_hub_upload_file', default='Upload File') }}</label>
+                            {{ upload_form.file(class="form-control", accept=".pdf,.mp4,.txt,.md") }}
+                            <div class="form-text">{{ t('learning_hub_supported_formats', default='Supported formats: PDF, MP4, TXT, MD') }}</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> {{ t('learning_hub_upload', default='Upload') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Share Ficore Africa Section -->
+    {% if current_user.is_authenticated %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>{{ t('general_share_ficore', default='Share Ficore Africa with Friends') }}</h5>
+            </div>
+            <div class="card-body">
+                <p>{{ t('general_share_ficore_invite', default='Invite your friends to join Ficore Africa and manage their finances better!') }}</p>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="referralLink" value="{{ url_for('auth.signup', ref=current_user.referral_code, _external=True) }}" readonly>
+                    <button class="btn btn-primary" type="button" onclick="copyReferralLink()">{{ t('general_profile_copy_link', default='Copy') }}</button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if current_user.is_authenticated and user_progress_data %}
+    // Progress Chart
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    const courseNames = [];
+    const progressData = [];
+    
+    {% for course_id, progress in user_progress_data.items() %}
+        {% set course = courses | selectattr('id', 'equalto', course_id) | first %}
+        {% if course %}
+            courseNames.push('{{ t(course.title_key, default=course.title_en) }}');
+            progressData.push({{ (progress.lessons_completed | length / course.lessons | length * 100) | round }});
+        {% endif %}
+    {% endfor %}
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: courseNames,
+            datasets: [{
+                label: '{{ t('learning_hub_progress_percentage', default='Progress %') }}',
+                data: progressData,
+                backgroundColor: '#2E7D32',
+                borderColor: '#1B5E20',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `{{ t('learning_hub_progress', default='Progress') }}: ${context.parsed.y}%`;
+                        }
+                    }
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+    {% endif %}
+
+    // Copy referral link
+    window.copyReferralLink = function() {
+        const referralLink = document.getElementById('referralLink');
+        referralLink.select();
+        document.execCommand('copy');
+        alert('{{ t('general_profile_link_copied', default='Referral link copied to clipboard!') }}');
+    };
+});
+</script>
+{% endblock %}

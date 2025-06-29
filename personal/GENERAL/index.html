@@ -1,0 +1,345 @@
+{% extends 'personal/base.html' %}
+{% block title %}{{ t('general_home', default='Home') }}{% endblock %}
+{% block content %}
+<div class="container">
+    <section class="hero text-center my-4">
+        <div class="hero-content">
+            <h2><i class="fas fa-wallet"></i> {{ t('general_all_in_one_toolkit', default='Your All-in-One Toolkit for Financial Health Across Africa') }}</h2>
+            <p class="mt-3"><i class="fas fa-shield-alt me-1" aria-hidden="true"></i> {{ t('general_money_control', default='Your Money. Your Control. Your Tools.') }}</p>
+            <div class="d-flex justify-content-center mt-3">
+                <a href="{{ url_for('financial_health.main') }}" class="btn btn-primary btn-explore" aria-label="{{ t('financial_health_get_health_score', default='Start Here – Check Your Financial Health') }}">{{ t('financial_health_get_health_score', default='Start Here – Check Your Financial Health') }}</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="journey-flow my-4">
+        <div class="journey-container text-center">
+            <h3>{{ t('general_your_financial_journey', default='Your Financial Journey') }}</h3>
+            <div class="journey-steps d-flex justify-content-center gap-3">
+                <a href="#assess-tools" class="journey-step" data-target="#collapseFinancialAssessment">
+                    <span class="step-badge">1</span>
+                    <span class="journey-icon"><i class="fas fa-stethoscope"></i></span>
+                    <p>{{ t('general_step1_assess', default='Step 1: Assess') }}</p>
+                </a>
+                <a href="#plan-tools" class="journey-step" data-target="#collapsePlanningTools">
+                    <span class="step-badge">2</span>
+                    <span class="journey-icon"><i class="fas fa-clipboard-list"></i></span>
+                    <p>{{ t('general_step2_plan', default='Step 2: Plan') }}</p>
+                </a>
+                <a href="#track-tools" class="journey-step" data-target="#collapseWealthTracking">
+                    <span class="step-badge">3</span>
+                    <span class="journey-icon"><i class="fas fa-chart-line"></i></span>
+                    <p>{{ t('general_step3_track', default='Step 3: Track & Learn') }}</p>
+                </a>
+                <a href="#grow-tools" class="journey-step" data-target="#collapseLearningGrowth">
+                    <span class="step-badge">4</span>
+                    <span class="journey-icon"><i class="fas fa-graduation-cap"></i></span>
+                    <p>{{ t('general_step4_grow', default='Step 4: Grow') }}</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="tools-section my-4" id="tools-section">
+        <h2 class="text-center"><i class="fas fa-tools"></i> {{ t('general_choose_tool', default='Choose a Tool') }}</h2>
+        <div class="accordion" id="toolsAccordion">
+            <div class="tool-group accordion-item" id="assess-tools">
+                <h3 class="group-title accordion-header" id="headingFinancialAssessment">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFinancialAssessment" aria-expanded="true" aria-controls="collapseFinancialAssessment">
+                        <i class="fas fa-stethoscope"></i> {{ t('general_financial_assessment_group', default='Financial Assessment') }}
+                    </button>
+                </h3>
+                <div id="collapseFinancialAssessment" class="accordion-collapse collapse show" aria-labelledby="headingFinancialAssessment" data-bs-parent="#toolsAccordion">
+                    <div class="accordion-body">
+                        <p class="group-subtext">{{ t('general_financial_assessment_subtext', default='Understand your financial behavior and readiness.') }}</p>
+                        <div class="tools-grid row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card tool-card custom-card">
+                                    <div class="card-body">
+                                        <h3 class="card-title"><i class="fas fa-heartbeat"></i> {{ t('financial_health_financial_health_score', default='Financial Health Score') }}</h3>
+                                        <span class="badge badge-success">{{ t('general_recommended_first_step', default='Recommended First Step') }}</span>
+                                        <p class="card-text">{{ t('financial_health_evaluate_finances', default='Evaluates income, expenses, and debt for a health score') }}</p>
+                                        <a href="{{ url_for('financial_health.main') }}" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ t('general_advisory_only', default='This is an advisory tool only. Ficore does not store or access your funds.') }}" aria-label="{{ t('financial_health_start_financial_health', default='Start Financial Health Score') }}">{{ t('general_start', default='Start') }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card tool-card custom-card">
+                                    <div class="card-body">
+                                        <h3 class="card-title"><i class="fas fa-question-circle"></i> {{ t('quiz_personality_quiz', default='Personality Quiz') }}</h3>
+                                        <p class="card-text">{{ t('quiz_assess_literacy', default='Answer questions to assess financial literacy') }}</p>
+                                        <a href="{{ url_for('quiz.main', course_id='financial_quiz') }}" class="btn btn-primary" aria-label="{{ t('quiz_start_personality_quiz', default='Start Personality Quiz') }}">{{ t('general_start', default='Start') }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card tool-card custom-card">
+                                    <div class="card-body">
+                                        <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> {{ t('general_general_dashboard', default='General Dashboard') }}</h3>
+                                        <p class="card-text">{{ t('general_general_dashboard_description', default='View a summary of all your financial metrics in one place') }}</p>
+                                        <a href="{{ url_for('general_dashboard') }}" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ t('general_advisory_only', default='This is an advisory tool only. Ficore does not store or access your funds.') }}" aria-label="{{ t('general_start_general_dashboard', default='Start General Dashboard') }}">{{ t('general_start', default='Start') }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tool-group accordion-item" id="plan-tools">
+                <h3 class="group-title accordion-header" id="headingPlanningTools">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePlanningTools" aria-expanded="false" aria-controls="collapsePlanningTools">
+                        <i class="fas fa-clipboard-list"></i> {{ t('general_planning_tools_group', default='Planning Tools') }}
+                    </button>
+                </h3>
+                <div id="collapsePlanningTools" class="accordion-collapse collapse" aria-labelledby="headingPlanningTools" data-bs-parent="#toolsAccordion">
+                    <div class="accordion-body">
+                        <p class="group-subtext">{{ t('general_planning_tools_subtext', default='Create a practical plan to manage your money with confidence.') }}</p>
+                        <div class="tools-grid row">
+                            <div class="col-md-4 mb-3">
+                                <div class="card tool-card custom-card">
+                                    <div class="card-body">
+                                        <h3 class="card-title"><i class="fas fa-calculator"></i> {{ t('budget_budget_planner', default='Budget Planner') }}</h3>
+                                        <p class="card-text">{{ t('budget_allocate_income', default='Allocate income across expense categories') }}</p>
+                                        <a href="{{ url_for('budget.main') }}" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ t('general_advisory_only', default='This is an advisory tool only. Ficore does not store or access your funds.') }}" aria-label="{{ t('budget_start_budget_planner', default='Start Monthly Budget Planner') }}">{{ t('general_start', default='Start') }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card tool-card custom-card">
+                                    <div class="card-body">
+                                        <h3 class="card-title"><i class="fas fa-file-invoice"></i> {{ t('bill_bill_planner', default='Bill Planner') }}</h3>
+                                        <p class="card-text">{{ t('bill_manage_bills', default='Manage and mark bills as paid') }}</p>
+                                        <a href="{{ url_for('bill.main') }}" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ t('general_advisory_only', default='This is an advisory tool only. Ficore does not store or access your funds.') }}" aria-label="{{ t('bill_start_bill_planner', default='Start Bill Planner') }}">{{ t('general_start', default='Start') }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card tool-card custom-card">
+                                    <div class="card-body">
+                                        <h3 class="card-title"><i class="fas fa-piggy-bank"></i> {{ t('emergency_fund_calculator', default='Emergency Fund Planner') }}</h3>
+                                        <p class="card-text">{{ t('emergency_fund_goal', default='Aims to cover 3-6 months of expenses for financial security') }}</p>
+                                        <a href="{{ url_for('emergency_fund.main') }}" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ t('general_advisory_only', default='This is an advisory tool only. Ficore does not store or access your funds.') }}" aria-label="{{ t('emergency_fund_start_emergency_fund', default='Start Emergency Fund Planner') }}">{{ t('general_start', default='Start') }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tool-group accordion-item" id="track-tools">
+                <h3 class="group-title accordion-header" id="headingWealthTracking">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWealthTracking" aria-expanded="false" aria-controls="collapseWealthTracking">
+                        <i class="fas fa-chart-line"></i> {{ t('general_wealth_tracking_group', default='Wealth Tracking') }}
+                    </button>
+                </h3>
+                <div id="collapseWealthTracking" class="accordion-collapse collapse" aria-labelledby="headingWealthTracking" data-bs-parent="#toolsAccordion">
+                    <div class="accordion-body">
+                        <p class="group-subtext">{{ t('general_wealth_tracking_subtext', default='Stay aware of your financial position at all times.') }}</p>
+                        <div class="tools-grid row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card tool-card custom-card">
+                                    <div class="card-body">
+                                        <h3 class="card-title"><i class="fas fa-balance-scale"></i> {{ t('net_worth_net_worth_calculator', default='Net Worth Tracker') }}</h3>
+                                        <p class="card-text">{{ t('net_worth_description', default='Your Net worth is your assets minus liabilities') }}</p>
+                                        <a href="{{ url_for('net_worth.main') }}" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ t('general_advisory_only', default='This is an advisory tool only. Ficore does not store or access your funds.') }}" aria-label="{{ t('net_worth_start_net_worth', default='Start Net Worth Tracker') }}">{{ t('general_start', default='Start') }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tool-group accordion-item" id="grow-tools">
+                <h3 class="group-title accordion-header" id="headingLearningGrowth">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLearningGrowth" aria-expanded="false" aria-controls="collapseLearningGrowth">
+                        <i class="fas fa-graduation-cap"></i> {{ t('general_learning_growth_group', default='Learning & Growth') }}
+                    </button>
+                </h3>
+                <div id="collapseLearningGrowth" class="accordion-collapse collapse" aria-labelledby="headingLearningGrowth" data-bs-parent="#toolsAccordion">
+                    <div class="accordion-body">
+                        <p class="group-subtext">{{ t('general_learning_growth_subtext', default='Build knowledge that helps you make smarter financial decisions.') }}</p>
+                        <div class="tools-grid row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card tool-card custom-card">
+                                    <div class="card-body">
+                                        <h3 class="card-title"><i class="fas fa-graduation-cap"></i> {{ t('learning_hub_courses', default='Learning Hub') }}</h3>
+                                        <p class="card-text">{{ t('learning_hub_dashboard', default='Access all courses to improve financial literacy') }}</p>
+                                        <a href="{{ url_for('learning_hub.main') }}" class="btn btn-primary" aria-label="{{ t('learning_hub_start_course', default='Start Course') }}">{{ t('general_start', default='Start') }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card tool-card custom-card">
+                                    <div class="card-body">
+                                        <h3 class="card-title"><i class="fas fa-book"></i> {{ t('learning_hub_recommended_learning', default='Recommended Learning') }}</h3>
+                                        <p class="card-text">{{ t('learning_hub_explore_courses', default='Explore our courses to improve your financial literacy!') }}</p>
+                                        {% if courses %}
+                                        {% for course in courses %}
+                                        <div class="mb-2">
+                                            <p><strong>{{ t(course.title_key, default=course.title_en) }}</strong></p>
+                                            <p>
+                                                {% if course.id == 'budgeting_101' %}
+                                                    {{ t('learning_hub_learn_budgeting', default='Learn the basics of creating and managing a budget.') }}
+                                                {% elif course.id == 'financial_quiz' %}
+                                                    {{ t('learning_hub_assess_personality', default='Take a quiz to discover your financial personality.') }}
+                                                {% elif course.id == 'savings_basics' %}
+                                                    {{ t('learning_hub_learn_savings', default='Learn strategies to save effectively.') }}
+                                                {% endif %}
+                                                <br>
+                                                {% if course.is_premium %}
+                                                    {{ t('learning_hub_premium_course', default='Premium course') }}
+                                                {% else %}
+                                                    {{ t('learning_hub_free_course', default='Free course') }}
+                                                {% endif %}
+                                            </p>
+                                            <a href="{{ url_for('learning_hub.main') }}" class="btn btn-primary course-link" aria-label="{{ t('learning_hub_start_course', default='Start Course') }} {{ t(course.title_key) }}">{{ t('general_start', default='Start') }}</a>
+                                        </div>
+                                        {% endfor %}
+                                        {% else %}
+                                        <p>{{ t('learning_hub_course_not_found', default='No courses available at the moment.') }}</p>
+                                        <a href="{{ url_for('learning_hub.main') }}" class="btn btn-primary course-link">{{ t('learning_hub_view_all_courses', default='View All Courses') }}</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="navigation-cards my-4">
+        <h3 class="section-title mb-3">{{ t('general_explore_features', default='Explore Features') }}</h3>
+        <div class="row g-3">
+            <div class="col-6 col-md-4">
+                <div class="nav-card">
+                    <div class="nav-card-icon">
+                        <i class="bi bi-newspaper"></i>
+                    </div>
+                    <div class="nav-card-content">
+                        <h4>{{ t('general_news', default='News') }}</h4>
+                        <p>{{ t('general_news_desc', default='Stay updated with financial news') }}</p>
+                    </div>
+                    <a href="{{ url_for('common_bp.news_list') }}" class="nav-card-link"></a>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="nav-card">
+                    <div class="nav-card-icon">
+                        <i class="bi bi-calculator"></i>
+                    </div>
+                    <div class="nav-card-content">
+                        <h4>{{ t('general_taxation', default='Taxation') }}</h4>
+                        <p>{{ t('general_taxation_desc', default='Calculate and manage taxes') }}</p>
+                    </div>
+                    <a href="{{ url_for('taxation_bp.calculate_tax') }}" class="nav-card-link"></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="why-section my-4">
+        <h2 class="section-heading text-center"><i class="fas fa-info-circle"></i> {{ t('general_why_ficore', default='Why Ficore Africa?') }}</h2>
+        <ul class="why-list list-unstyled">
+            <li><i class="fas fa-check-circle"></i> {{ t('general_localized', default='Localized for Africa with support for Naira and regional financial contexts') }}</li>
+            <li><i class="fas fa-check-circle"></i> {{ t('general_empowers', default='Empowers financial literacy with easy-to-use tools') }}</li>
+            <li><i class="fas fa-check-circle"></i> {{ t('general_actionable', default='Provides actionable insights for better financial decisions') }}</li>
+        </ul>
+    </section>
+
+    <section class="testimonials-section my-4">
+        <h2 class="section-heading text-center"><i class="fas fa-quote-left"></i> {{ t('general_testimonials', default='What People Are Saying About Us') }}</h2>
+        <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="testimonial text-center">
+                        <div class="avatar-circle">MU</div>
+                        <p><i class="fas fa-quote-left quote"></i> {{ t('general_impressed_features', default='I explored the features earlier today and was impressed... I thought it was only for SMEs, but I see value for individuals too!') }}</p>
+                        <p class="name">Maisarata Uqubatu</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="testimonial text-center">
+                        <div class="avatar-circle">AA</div>
+                        <p><i class="fas fa-quote-left quote"></i> {{ t('general_ficore_praise', default='🔥 Ficore 🔥') }}</p>
+                        <p class="name">Abubakar Abdulkadir, {{ t('general_software_engineer', default='Software Engineer for Sustainable Solutions') }}</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="testimonial text-center">
+                        <div class="avatar-circle">ASU</div>
+                        <p><i class="fas fa-quote-left quote"></i> {{ t('general_potential_support', default='I've been following the Ficore project and I'm impressed. It's clear there's potential, and I look forward to supporting.') }}</p>
+                        <p class="name">Aminu Sani Usman</p>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">{{ t('general_previous', default='Previous') }}</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">{{ t('general_next', default='Next') }}</span>
+            </button>
+        </div>
+    </section>
+
+    <section class="faq-section my-4">
+        <h2 class="section-heading text-center"><i class="fas fa-question-circle"></i> {{ t('general_faq', default='Frequently Asked Questions') }}</h2>
+        <div class="container">
+            <div class="faq-item">
+                <h3><i class="fas fa-shield-alt me-1" aria-hidden="true"></i> {{ t('general_faq_fund_handling', default='Does Ficore store or manage my money?') }}</h3>
+                <p>{{ t('general_faq_fund_handling_answer', default='No. We provide guidance and tracking tools only. Your money stays with you.') }}</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section my-4 text-center">
+        <h3><i class="fas fa-rocket"></i> {{ t('general_ready_to_take_charge', default='Ready to take charge of your finances?') }}</h3>
+        <p>{{ t('general_start_quiz', default='Start with a quick assessment of your financial personality.') }}</p>
+        <a href="{{ url_for('quiz.main', course_id='financial_quiz') }}" class="btn btn-primary btn-explore" aria-label="{{ t('quiz_start_personality_quiz', default='Start Personality Quiz') }}">{{ t('general_start', default='Start') }}</a>
+    </section>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Bootstrap carousel
+        const carousel = new bootstrap.Carousel(document.getElementById('testimonialCarousel'), {
+            interval: 5000,
+            ride: 'carousel'
+        });
+
+        // Link journey steps to accordions
+        document.querySelectorAll('.journey-step').forEach(step => {
+            step.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('data-target'); // e.g., #collapseFinancialAssessment
+                const targetElement = document.querySelector(targetId);
+                const accordionItem = targetElement.closest('.accordion-item'); // e.g., #assess-tools
+
+                if (targetElement && accordionItem) {
+                    // Use Bootstrap's Collapse API to show the target accordion
+                    const collapseInstance = new bootstrap.Collapse(targetElement, {
+                        toggle: false // Prevent auto-toggle, we'll handle it manually
+                    });
+
+                    // If the accordion is not already open, open it
+                    if (!targetElement.classList.contains('show')) {
+                        collapseInstance.show();
+                    }
+
+                    // Scroll to the accordion item with an offset
+                    setTimeout(() => {
+                        const yOffset = -60; // Adjust for navbar height
+                        const y = accordionItem.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                        window.scrollTo({ top: y, behavior: 'smooth' });
+                    }, 300); // Delay to allow accordion animation
+                }
+            });
+        });
+    });
+</script>
+<script src="{{ url_for('static', filename='js/interactivity.js') }}"></script>
+{% endblock %}

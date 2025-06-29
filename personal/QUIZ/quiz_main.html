@@ -1,0 +1,314 @@
+{% extends "personal/base.html" %}
+{% block title %}{{ t('quiz_financial_personality_quiz', default='Financial Personality Quiz') }}{% endblock %}
+{% block extra_head %}
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<div class="container">
+    {% set tool_name = 'quiz_financial_personality_quiz' %}
+    {% set tool_icon = 'fa-user-circle' %}
+    {% set subtitle = t('quiz_discover_personality', default='Discover your financial personality and get personalized insights') %}
+    {% include 'personal/GENERAL/tool_header.html' %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('general_close', default='Close') }}"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="quizTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="take-quiz-tab" data-bs-toggle="tab" data-bs-target="#take-quiz" type="button" role="tab" aria-controls="take-quiz" aria-selected="true">
+                <i class="fas fa-play"></i> {{ t('quiz_take_quiz', default='Take Quiz') }}
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="results-tab" data-bs-toggle="tab" data-bs-target="#results" type="button" role="tab" aria-controls="results" aria-selected="false">
+                <i class="fas fa-chart-pie"></i> {{ t('quiz_results', default='Results') }}
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="quizTabContent">
+        <!-- Take Quiz Tab -->
+        <div class="tab-pane fade show active" id="take-quiz" role="tabpanel" aria-labelledby="take-quiz-tab">
+            <form method="POST" action="{{ url_for('quiz.main') }}" id="quizForm" class="validate-form">
+                {{ form.csrf_token }}
+                <input type="hidden" name="action" value="submit_quiz">
+
+                <!-- Personal Information -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-user"></i> {{ t('quiz_personal_info', default='Personal Information') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('general_first_name', default='First Name') }}</label>
+                                    {{ form.first_name(class="form-control", placeholder=t('general_first_name_placeholder', default='e.g., Ahmad')) }}
+                                    <div class="invalid-feedback">{{ t('general_first_name_required', default='First name is required') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('general_email', default='Email') }}</label>
+                                    {{ form.email(class="form-control", placeholder=t('general_email_placeholder', default='e.g., ahmad@example.com')) }}
+                                    <div class="invalid-feedback">{{ t('general_email_required', default='Valid email is required') }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">{{ t('general_language', default='Language') }}</label>
+                                    {{ form.lang(class="form-select") }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 form-check mt-4">
+                                    {{ form.send_email(class="form-check-input") }}
+                                    <label class="form-check-label">{{ t('quiz_send_email', default='Send me my results by email') }}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Questions -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-question-circle"></i> {{ t('quiz_questions', default='Quiz Questions') }}</h5>
+                        <div class="progress mt-2">
+                            <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="quizProgress">0%</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% for question in questions %}
+                            <div class="question-block border-bottom pb-3 mb-3" data-question="{{ loop.index }}">
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold">
+                                        <span class="question-number">{{ loop.index }}.</span>
+                                        <span class="question-icon">{{ question.icon }}</span>
+                                        {{ t(question.text_key, default=question.text) }}
+                                        <span class="question-status"></span>
+                                    </label>
+                                </div>
+                                <div class="button-container">
+                                    {% for choice_value, choice_label in form[question.id].choices %}
+                                        <input type="radio" class="d-none" name="{{ question.id }}" id="{{ question.id }}_{{ loop.index }}" value="{{ choice_value }}">
+                                        <button type="button" class="btn-quiz-answer {{ 'yes' if choice_value == 'Yes' else 'no' }}" data-input-id="{{ question.id }}_{{ loop.index }}">
+                                            {{ t('quiz_' + choice_value.lower(), default=choice_label) }}
+                                        </button>
+                                    {% endfor %}
+                                </div>
+                                {% if question.tooltip %}
+                                    <small class="form-text text-muted">{{ t(question.tooltip, default='') }}</small>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg" id="submitQuiz" disabled>
+                    <i class="fas fa-chart-pie"></i> {{ t('quiz_see_results', default='See My Results') }}
+                </button>
+            </form>
+        </div>
+
+        <!-- Results Tab -->
+        <div class="tab-pane fade" id="results" role="tabpanel" aria-labelledby="results-tab">
+            {% if latest_record %}
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body text-center">
+                                <h6>{{ t('quiz_your_personality', default='Your Personality') }}</h6>
+                                <h4>{{ t('quiz_' + latest_record.personality.lower() + '_description', default=latest_record.personality) }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h6>{{ t('quiz_score', default='Score') }}</h6>
+                                <h4>{{ latest_record.score | default(0) }} / {{ max_score }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <h6>{{ t('general_created_at', default='Completed') }}</h6>
+                                <h6>{{ latest_record.created_at.strftime('%Y-%m-%d') if latest_record.created_at else t('general_not_available', default='Not Available') }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Badges -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6><i class="fas fa-trophy"></i> {{ t('quiz_badges', default='Badges') }}</h6>
+                    </div>
+                    <div class="card-body">
+                        {% if latest_record.badges %}
+                            {% for badge in latest_record.badges %}
+                                <span class="badge {{ badge.color_class }} me-1 mb-1" title="{{ t('quiz_badge_' + badge.name.lower().replace(' ', '_') + '_desc', default=badge.description | default('No description')) }}">
+                                    {{ t('quiz_badge_' + badge.name.lower().replace(' ', '_'), default=badge.name | default('Unknown')) }}
+                                </span>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted">{{ t('quiz_no_badges', default='No badges earned yet') }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Insights -->
+                {% if insights %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6><i class="fas fa-lightbulb"></i> {{ t('quiz_insights', default='Insights') }}</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                {% for insight in insights %}
+                                    <li><i class="fas fa-check-circle text-success"></i> {{ insight }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Tips -->
+                {% if tips %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6><i class="fas fa-rocket"></i> {{ t('quiz_tips_for_improving_financial_habits', default='Tips for Improving Financial Habits') }}</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                {% for tip in tips %}
+                                    <li><i class="fas fa-arrow-up text-primary"></i> {{ tip }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="text-center">
+                    <button class="btn btn-primary" onclick="document.getElementById('take-quiz-tab').click()">
+                        <i class="fas fa-redo"></i> {{ t('quiz_retake_quiz', default='Retake Quiz') }}
+                    </button>
+                </div>
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-circle fa-3x mb-3 text-muted"></i>
+                        <p>{{ t('quiz_no_results', default='No quiz results available') }}</p>
+                        <p>{{ t('quiz_complete_quiz', default='Complete the quiz to see your financial personality results.') }}</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Share Ficore Africa Section -->
+    {% if current_user.is_authenticated %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>{{ t('general_share_ficore', default='Share Ficore Africa with Friends') }}</h5>
+            </div>
+            <div class="card-body">
+                <p>{{ t('general_share_ficore_invite', default='Invite your friends to join Ficore Africa and manage their finances better!') }}</p>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="referralLink" value="{{ url_for('auth.signup', ref=current_user.referral_code, _external=True) }}" readonly>
+                    <button class="btn btn-primary" type="button" onclick="copyReferralLink()">{{ t('general_profile_copy_link', default='Copy') }}</button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const questions = document.querySelectorAll('.question-block');
+    const submitButton = document.getElementById('submitQuiz');
+    const progressBar = document.getElementById('quizProgress');
+    let answeredQuestions = 0;
+
+    function updateProgress() {
+        const percentage = (answeredQuestions / questions.length) * 100;
+        progressBar.style.width = percentage + '%';
+        progressBar.textContent = Math.round(percentage) + '%';
+        progressBar.setAttribute('aria-valuenow', percentage);
+        
+        submitButton.disabled = answeredQuestions < questions.length;
+    }
+
+    questions.forEach(question => {
+        const buttons = question.querySelectorAll('.btn-quiz-answer');
+        const radios = question.querySelectorAll('input[type="radio"]');
+        const statusSpan = question.querySelector('.question-status');
+        let isAnswered = false;
+
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons in this question
+                buttons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Check the corresponding radio input
+                const inputId = this.getAttribute('data-input-id');
+                const radio = document.getElementById(inputId);
+                radio.checked = true;
+                
+                // Update question status
+                if (!isAnswered) {
+                    answeredQuestions++;
+                    isAnswered = true;
+                }
+                statusSpan.innerHTML = '<i class="fas fa-check text-success"></i>';
+                updateProgress();
+            });
+        });
+
+        // Initialize status for pre-selected answers
+        radios.forEach(radio => {
+            if (radio.checked) {
+                const button = question.querySelector(`.btn-quiz-answer[data-input-id="${radio.id}"]`);
+                if (button) {
+                    button.classList.add('active');
+                    statusSpan.innerHTML = '<i class="fas fa-check text-success"></i>';
+                    if (!isAnswered) {
+                        answeredQuestions++;
+                        isAnswered = true;
+                    }
+                }
+            }
+        });
+    });
+
+    // Initial progress update
+    updateProgress();
+
+    // Copy referral link
+    window.copyReferralLink = function() {
+        const referralLink = document.getElementById('referralLink');
+        referralLink.select();
+        document.execCommand('copy');
+        alert('{{ t('general_profile_link_copied', default='Referral link copied to clipboard!') }}');
+    };
+});
+</script>
+{% endblock %}
