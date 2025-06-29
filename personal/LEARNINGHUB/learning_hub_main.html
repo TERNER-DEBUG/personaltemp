@@ -92,14 +92,14 @@
                                     {% endif %}
                                 </div>
                                 <div class="card-footer">
-                                    <a href="{{ url_for('learning_hub.course_overview', course_id=course.id) }}" class="btn btn-primary">
+                                    <a href="{{ url_for('learning_hub.main') }}" class="btn btn-primary">
                                         {% if current_user.is_authenticated and user_progress_data.get(course.id, {}).get('lessons_completed') %}
                                             <i class="fas fa-play"></i> {{ t('learning_hub_continue', default='Continue') }}
                                         {% else %}
                                             <i class="fas fa-play"></i> {{ t('learning_hub_start', default='Start') }}
                                         {% endif %}
                                     </a>
-                                    <a href="{{ url_for('learning_hub.course_overview', course_id=course.id) }}" class="btn btn-outline-secondary">
+                                    <a href="{{ url_for('learning_hub.main') }}" class="btn btn-outline-secondary">
                                         <i class="fas fa-info-circle"></i> {{ t('learning_hub_details', default='Details') }}
                                     </a>
                                 </div>
@@ -182,7 +182,7 @@
                                             </div>
                                         </div>
                                         <div class="mt-2">
-                                            <a href="{{ url_for('learning_hub.course_overview', course_id=course.id) }}" class="btn btn-sm btn-primary">
+                                            <a href="{{ url_for('learning_hub.main') }}" class="btn btn-sm btn-primary">
                                                 <i class="fas fa-play"></i> {{ t('learning_hub_continue', default='Continue') }}
                                             </a>
                                         </div>
@@ -209,7 +209,7 @@
                         <i class="fas fa-user-lock fa-3x mb-3 text-muted"></i>
                         <h5>{{ t('learning_hub_login_required', default='Login Required') }}</h5>
                         <p>{{ t('learning_hub_login_to_track_progress', default='Please log in to track your learning progress.') }}</p>
-                        <a href="{{ url_for('auth.signin') }}" class="btn btn-primary">
+                        <a href="{{ url_for('users_blueprint.login') }}" class="btn btn-primary">
                             <i class="fas fa-sign-in-alt"></i> {{ t('general_login', default='Login') }}
                         </a>
                     </div>
@@ -225,7 +225,7 @@
                     <h5><i class="fas fa-upload"></i> {{ t('learning_hub_upload_content', default='Upload Learning Content') }}</h5>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{ url_for('learning_hub.upload_content') }}" enctype="multipart/form-data" class="validate-form">
+                    <form method="POST" action="{{ url_for('learning_hub.main') }}" enctype="multipart/form-data" class="validate-form">
                         {{ upload_form.csrf_token }}
                         
                         <div class="row">
@@ -291,7 +291,7 @@
             <div class="card-body">
                 <p>{{ t('general_share_ficore_invite', default='Invite your friends to join Ficore Africa and manage their finances better!') }}</p>
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" id="referralLink" value="{{ url_for('auth.signup', ref=current_user.referral_code, _external=True) }}" readonly>
+                    <input type="text" class="form-control" id="referralLink" value="{{ url_for('users_blueprint.signup', ref=current_user.referral_code, _external=True) }}" readonly>
                     <button class="btn btn-primary" type="button" onclick="copyReferralLink()">{{ t('general_profile_copy_link', default='Copy') }}</button>
                 </div>
             </div>

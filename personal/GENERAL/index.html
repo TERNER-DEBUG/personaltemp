@@ -68,7 +68,7 @@
                                     <div class="card-body">
                                         <h3 class="card-title"><i class="fas fa-question-circle"></i> {{ t('quiz_personality_quiz', default='Personality Quiz') }}</h3>
                                         <p class="card-text">{{ t('quiz_assess_literacy', default='Answer questions to assess financial literacy') }}</p>
-                                        <a href="{{ url_for('quiz.main', course_id='financial_quiz') }}" class="btn btn-primary" aria-label="{{ t('quiz_start_personality_quiz', default='Start Personality Quiz') }}">{{ t('general_start', default='Start') }}</a>
+                                        <a href="{{ url_for('quiz.main') }}" class="btn btn-primary" aria-label="{{ t('quiz_start_personality_quiz', default='Start Personality Quiz') }}">{{ t('general_start', default='Start') }}</a>
                                     </div>
                                 </div>
                             </div>
@@ -298,7 +298,7 @@
     <section class="cta-section my-4 text-center">
         <h3><i class="fas fa-rocket"></i> {{ t('general_ready_to_take_charge', default='Ready to take charge of your finances?') }}</h3>
         <p>{{ t('general_start_quiz', default='Start with a quick assessment of your financial personality.') }}</p>
-        <a href="{{ url_for('quiz.main', course_id='financial_quiz') }}" class="btn btn-primary btn-explore" aria-label="{{ t('quiz_start_personality_quiz', default='Start Personality Quiz') }}">{{ t('general_start', default='Start') }}</a>
+        <a href="{{ url_for('quiz.main') }}" class="btn btn-primary btn-explore" aria-label="{{ t('quiz_start_personality_quiz', default='Start Personality Quiz') }}">{{ t('general_start', default='Start') }}</a>
     </section>
 </div>
 {% endblock %}
