@@ -229,7 +229,7 @@
             <div class="card-body">
                 <p>{{ t('general_share_ficore_invite', default='Invite your friends to join Ficore Africa and manage their finances better!') }}</p>
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" id="referralLink" value="{{ url_for('auth.signup', ref=current_user.referral_code, _external=True) }}" readonly>
+                    <input type="text" class="form-control" id="referralLink" value="{{ url_for('users_blueprint.signup', ref=current_user.referral_code, _external=True) }}" readonly>
                     <button class="btn btn-primary" type="button" onclick="copyReferralLink()">{{ t('general_profile_copy_link', default='Copy') }}</button>
                 </div>
             </div>

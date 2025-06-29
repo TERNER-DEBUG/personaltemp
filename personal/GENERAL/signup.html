@@ -1,11 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'personal/base.html' %}
 {% block title %}{{ t('general_signup', default='Sign Up') }}{% endblock %}
 {% block content %}
 <div class="container step-container">
     {% set tool_name = 'general_signup' %}
     {% set tool_icon = 'fa-user-plus' %}
     {% set subtitle = t('general_signup_subtitle', default='Create your account to start managing your finances') %}
-    {% include 'tool_header.html' %}
+    {% include 'personal/GENERAL/tool_header.html' %}
     
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -26,7 +26,7 @@
     
     <div class="card">
         <div class="card-body">
-            <form method="POST" action="{{ url_for('auth.signup') }}" id="signupForm">
+            <form method="POST" action="{{ url_for('users_blueprint.signup') }}" id="signupForm">
                 {{ form.csrf_token }}
                 {% if referral_code %}
                     <input type="hidden" name="referral_code" value="{{ referral_code }}">
@@ -58,7 +58,7 @@
                     <div class="invalid-feedback">{{ t('general_confirm_password_required', default='Passwords must match') }}</div>
                 </div>
                 <button type="submit" class="btn btn-primary" id="signupButton">{{ t('general_signup', default='Sign Up') }}</button>
-                <a href="{{ url_for('auth.signin') }}" class="btn btn-outline-secondary">{{ t('general_already_have_account', default='Already have an account? Sign In') }}</a>
+                <a href="{{ url_for('users_blueprint.login') }}" class="btn btn-outline-secondary">{{ t('general_already_have_account', default='Already have an account? Sign In') }}</a>
             </form>
         </div>
     </div>

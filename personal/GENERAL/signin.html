@@ -1,11 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'personal/base.html' %}
 {% block title %}{{ t('general_signin', default='Sign In') }}{% endblock %}
 {% block content %}
 <div class="container step-container">
     {% set tool_name = 'general_signin' %}
     {% set tool_icon = 'fa-sign-in-alt' %}
     {% set subtitle = t('general_signin_subtitle', default='Access your account to manage your finances') %}
-    {% include 'tool_header.html' %}
+    {% include 'personal/GENERAL/tool_header.html' %}
     
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -20,7 +20,7 @@
     
     <div class="card">
         <div class="card-body">
-            <form method="POST" action="{{ url_for('auth.signin') }}" id="signinForm">
+            <form method="POST" action="{{ url_for('users_blueprint.login') }}" id="signinForm">
                 {{ form.csrf_token }}
                 <div class="mb-3">
                     <label for="email" class="form-label">{{ t('general_email', default='Email') }}</label>
@@ -36,18 +36,18 @@
                     <div class="invalid-feedback">{{ t('general_password_required', default='Password is required') }}</div>
                 </div>
                 <div class="mb-3 text-end">
-                    <a href="{{ url_for('auth.forgot_password') }}">{{ t('general_forgot_password', default='Forgot Password?') }}</a>
+                    <a href="{{ url_for('users_blueprint.forgot_password') }}">{{ t('general_forgot_password', default='Forgot Password?') }}</a>
                 </div>
                 <button type="submit" class="btn btn-primary" id="signinButton">{{ t('general_signin', default='Sign In') }}</button>
-                <a href="{{ url_for('auth.signup') }}" class="btn btn-outline-secondary">{{ t('general_no_account', default='No account? Sign Up') }}</a>
+                <a href="{{ url_for('users_blueprint.signup') }}" class="btn btn-outline-secondary">{{ t('general_no_account', default='No account? Sign Up') }}</a>
                 <div class="mt-3 text-center">
                     <p>{{ t('general_or_signin_with', default='Or sign in with') }}</p>
-                    <a href="{{ url_for('auth.google_login') }}" class="btn btn-outline-primary">
+                    <a href="{{ url_for('users_blueprint.google_login') }}" class="btn btn-outline-primary">
                         <i class="fab fa-google"></i> {{ t('general_google_signin', default='Sign in with Google') }}
                     </a>
                 </div>
                 <div class="mt-3 text-center">
-                    <a href="{{ url_for('auth.anonymous', next=request.args.get('next')) }}" class="btn btn-outline-secondary">{{ t('general_continue_anonymously', default='Continue Anonymously') }}</a>
+                    <a href="{{ url_for('users_blueprint.anonymous', next=request.args.get('next')) }}" class="btn btn-outline-secondary">{{ t('general_continue_anonymously', default='Continue Anonymously') }}</a>
                 </div>
             </form>
         </div>

@@ -53,7 +53,7 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="toolsDropdown">
                             <li><a class="dropdown-item" href="{{ url_for('financial_health.main') | e }}">{{ t('financial_health_financial_health_score', default='Financial Health Score') | e }}</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('quiz.main', course_id='financial_quiz') | e }}">{{ t('quiz_personality_quiz', default='Personality Quiz') | e }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('quiz.main') | e }}">{{ t('quiz_personality_quiz', default='Personality Quiz') | e }}</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('general_dashboard') | e }}">{{ t('general_general_dashboard', default='General Dashboard') | e }}</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('budget.main') | e }}">{{ t('budget_budget_planner', default='Budget Planner') | e }}</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('bill.main') | e }}">{{ t('bill_bill_planner', default='Bill Planner') | e }}</a></li>

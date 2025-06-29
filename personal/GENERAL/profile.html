@@ -1,11 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'personal/base.html' %}
 {% block title %}{{ t('general_profile_title', default='Your Profile') }}{% endblock %}
 {% block content %}
 <div class="container step-container">
     {% set tool_name = 'general_profile_title' %}
     {% set tool_icon = 'fa-user' %}
     {% set subtitle = t('general_profile_subtitle', default='Manage your account and referral information') %}
-    {% include 'tool_header.html' %}
+    {% include 'personal/GENERAL/tool_header.html' %}
     
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -55,7 +55,7 @@
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">{{ t('general_auth_change_password', default='Change Password') }}</h5>
-            <form method="POST" action="{{ url_for('auth.profile') }}" id="changePasswordForm" class="validate-form">
+            <form method="POST" action="{{ url_for('settings_blueprint.profile') }}" id="changePasswordForm" class="validate-form">
                 {{ password_form.csrf_token }}
                 <div class="mb-3">
                     <label for="current_password" class="form-label">{{ t('general_auth_current_password', default='Current Password') }}</label>

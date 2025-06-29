@@ -1,11 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'personal/base.html' %}
 {% block title %}{{ t('bill_view_edit_bills', default='View and Edit Bills') }}{% endblock %}
 {% block content %}
 <div class="container">
     {% set tool_name = 'bill_view_edit_bills' %}
     {% set tool_icon = 'fa-edit' %}
     {% set subtitle = t('bill_view_edit_subtitle', default='View and manage your existing bills') %}
-    {% include 'tool_header.html' %}
+    {% include 'personal/GENERAL/tool_header.html' %}
     
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -23,7 +23,7 @@
             <div class="card mb-3">
                 <div class="card-body">
                     <h5 class="card-title">{{ bill.bill_name }} (₦{{ bill.amount | format_currency }})</h5>
-                    <form method="POST" action="{{ url_for('bill.view_edit') }}" novalidate>
+                    <form method="POST" action="{{ url_for('bill.main') }}" novalidate>
                         {{ form.csrf_token }}
                         <input type="hidden" name="bill_id" value="{{ bill_id }}">
                         <div class="mb-3">
@@ -109,14 +109,14 @@
                 </div>
             </div>
         {% endfor %}
-        <a href="{{ url_for('bill.form_step1') }}" class="btn btn-primary">{{ t('bill_add_bill', default='Add Bill') }}</a>
-        <a href="{{ url_for('bill.dashboard') }}" class="btn btn-outline-secondary">{{ t('bill_back_to_dashboard', default='Back to Dashboard') }}</a>
+        <a href="{{ url_for('bill.main') }}" class="btn btn-primary">{{ t('bill_add_bill', default='Add Bill') }}</a>
+        <a href="{{ url_for('bill.main') }}" class="btn btn-outline-secondary">{{ t('bill_back_to_dashboard', default='Back to Dashboard') }}</a>
     {% else %}
         <div class="card text-center">
             <div class="card-body">
                 <i class="fas fa-file-invoice fa-3x mb-3 text-muted"></i>
                 <p>{{ t('bill_no_bills_empty_state', default='No bills added yet. Start by adding one!') }}</p>
-                <a href="{{ url_for('bill.form_step1') }}" class="btn btn-primary">{{ t('bill_add_bill', default='Add Bill') }}</a>
+                <a href="{{ url_for('bill.main') }}" class="btn btn-primary">{{ t('bill_add_bill', default='Add Bill') }}</a>
             </div>
         </div>
     {% endif %}
