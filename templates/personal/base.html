@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="{{ session.get('lang', 'en') | e }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ t('general_app_description', default='Ficore Africa: Empowering financial growth across Africa') | e }}">
+    <meta name="keywords" content="personal finance, financial planning, budgeting, Africa">
+    <meta name="author" content="FiCore">
+    <meta name="csrf-token" content="{{ csrf_token() | e }}">
+    <title>{% block title %}{{ t('general_ficore_africa', default='Ficore Africa') | e }}{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles-base.css') | e }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles-modules.css') | e }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') | e }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') | e }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32x32.png') | e }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/favicon-16x16.png') | e }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="header-message">
+        {{ t('general_welcome_to_ficore', default='Welcome to Ficore Africa Tools Suite: Use Ficore to Track your income, net worth, budgets, and bills, to grow your money with confidence.') | e }}
+    </div>
+
+    {% if current_user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') | e }}" aria-label="{{ t('general_home', default='Home') | e }}">
+                <img src="{{ url_for('static', filename='img/ficore_logo.png') | e }}" alt="{{ t('general_ficore_africa_logo', default='Ficore Africa Logo') | e }}" class="logo" style="border-radius: 50%; object-fit: contain; width: 80px; height: 80px;" onerror="this.src='{{ url_for('static', filename='img/fallback-logo.png') | e }}';">
+                {{ t('general_ficore_africa', default='Ficore Africa') | e }}
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="{{ t('general_toggle_navigation', default='Toggle navigation') | e }}">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') | e }}" data-bs-toggle="tooltip" data-bs-title="{{ t('general_home_tooltip', default='Go to homepage') | e }}">{{ t('general_home', default='Home') | e }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('about') | e }}" data-bs-toggle="tooltip" data-bs-title="{{ t('general_about_tooltip', default='Learn more about Ficore') | e }}">{{ t('general_about', default='About') | e }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('contact') | e }}" data-bs-toggle="tooltip" data-bs-title="{{ t('general_contact_tooltip', default='Get in touch') | e }}">{{ t('general_contact', default='Contact') | e }}</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-title="{{ t('general_tools_tooltip', default='Financial tools') | e }}" aria-label="{{ t('general_tools', default='Tools') | e }}">
+                            {{ t('general_tools', default='Tools') | e }}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="toolsDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('financial_health.main') | e }}">{{ t('financial_health_financial_health_score', default='Financial Health Score') | e }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('quiz.main') | e }}">{{ t('quiz_personality_quiz', default='Personality Quiz') | e }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('general_dashboard') | e }}">{{ t('general_general_dashboard', default='General Dashboard') | e }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('budget.main') | e }}">{{ t('budget_budget_planner', default='Budget Planner') | e }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('bill.main') | e }}">{{ t('bill_bill_planner', default='Bill Planner') | e }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('emergency_fund.main') | e }}">{{ t('emergency_fund_calculator', default='Emergency Fund Planner') | e }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('net_worth.main') | e }}">{{ t('net_worth_net_worth_calculator', default='Net Worth Tracker') | e }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('learning_hub.main') | e }}">{{ t('learning_hub_courses', default='Learning Hub') | e }}</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="newsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-title="{{ t('general_news_tooltip', default='View news and updates') | e }}" aria-label="{{ t('general_news', default='News') | e }}">
+                            {{ t('general_news', default='News') | e }}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="newsDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('common_bp.news_list') | e }}">{{ t('general_ficore_news', default='Ficore News') | e }}</a></li>
+                            {% if current_user.get('is_admin', False) %}
+                            <li><a class="dropdown-item" href="{{ url_for('common_bp.news_management') | e }}">{{ t('general_news_management', default='News Management') | e }}</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="taxationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-title="{{ t('general_taxation_tooltip', default='Manage tax obligations') | e }}" aria-label="{{ t('general_taxation', default='Taxation') | e }}">
+                            {{ t('general_taxation', default='Taxation') | e }}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="taxationDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('taxation_bp.calculate_tax') | e }}">{{ t('general_calculate_your_tax', default='Calculate Your Tax') | e }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('taxation_bp.payment_info') | e }}">{{ t('general_tax_payment_information', default='Tax Payment Information') | e }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('taxation_bp.reminders') | e }}">{{ t('general_your_tax_reminders', default='Your Tax Reminders') | e }}</a></li>
+                        </ul>
+                    </li>
+                    {% if current_user.get('is_admin', False) %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_blueprint.dashboard') | e }}">{{ t('admin_admin_panel', default='Admin Panel') | e }}</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center header-actions">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <button class="notification-bell" id="notificationBell" data-bs-toggle="modal" data-bs-target="#notificationModal" data-bs-title="{{ t('general_notifications_tooltip', default='View notifications') | e }}" aria-label="{{ t('general_notifications', default='Notifications') | e }}">
+                                <i class="bi bi-bell"></i>
+                                <span class="notification-badge" id="notificationBadge"></span>
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <a class="profile-icon" href="{{ url_for('settings_blueprint.profile') | e }}" data-bs-toggle="tooltip" data-bs-title="{{ t('general_profile_tooltip', default='Manage your account') | e }}" aria-label="{{ t('general_profile', default='Profile') | e }}">
+                                <i class="bi bi-person-dash"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-title="{{ t('general_profile_tooltip', default='Manage your account') | e }}" aria-label="{{ t('general_profile', default='Profile') | e }}">
+                                {{ current_user.display_name | default(t('general_profile', default='Profile') | e) | e }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('settings_blueprint.profile') | e }}">{{ t('general_profile', default='Profile') | e }}</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('feedback') | e }}">{{ t('general_feedback', default='Send Feedback') | e }}</a></li>
+                                {% if current_user.get('is_admin', False) %}
+                                <li><a class="dropdown-item" href="{{ url_for('admin_blueprint.dashboard') | e }}">{{ t('admin_admin_panel', default='Admin Panel') | e }}</a></li>
+                                {% endif %}
+                                <li><a class="dropdown-item" href="{{ url_for('users_blueprint.logout') | e }}">{{ t('general_logout', default='Logout') | e }}</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('users_blueprint.login') | e }}" data-bs-toggle="tooltip" data-bs-title="{{ t('general_login_tooltip', default='Log in to your account') | e }}">{{ t('general_login', default='Login') | e }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('users_blueprint.signup') | e }}" data-bs-toggle="tooltip" data-bs-title="{{ t('general_signup_tooltip', default='Create a new account') | e }}">{{ t('general_signup', default='Sign Up') | e }}</a></li>
+                    {% endif %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-title="{{ t('general_language_tooltip', default='Change language') | e }}" aria-label="{{ t('general_language', default='Language') | e }}">
+                            {{ session.get('lang', 'en').upper() | e }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('set_language', lang='en') | e }}">{{ t('general_english', default='English') | e }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('set_language', lang='ha') | e }}">{{ t('general_hausa', default='Hausa') | e }}</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link btn btn-link" id="darkModeToggle" onclick="toggleDarkMode()" data-bs-toggle="tooltip" data-bs-title="{{ t('general_mode_toggle_tooltip_switch_to_dark', default='Switch to dark mode') | e }}" aria-label="{{ t('general_mode_toggle_dark', default='Toggle dark mode') | e }}">
+                            <i class="bi bi-moon-stars"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    {% if not session.get('consent_acknowledged') %}
+    <div class="consent-banner alert alert-info alert-dismissible fade show" id="consentBanner" role="alert">
+        <i class="fas fa-shield-alt me-1" aria-hidden="true"></i> {{ t('general_consent_banner', default='By using Ficore, you understand that we provide tools for planning only, not banking.') | e }}
+        <button type="button" class="btn btn-primary btn-sm ms-2" id="acknowledgeConsentBtn">{{ t('general_accept', default='Accept') | e }}</button>
+    </div>
+    {% endif %}
+
+    <div class="container alert-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ t(message, default=message) | e }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t('general_close', default='Close') | e }}"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="main-content">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    {% if current_user.is_authenticated and current_user.role in ['trader', 'personal'] %}
+    <nav class="bottom-navigation">
+        <div class="nav-container">
+            <a href="{{ url_for('index') }}" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">
+                <i class="bi bi-house"></i>
+                <span>{{ t('general_home', default='Home') }}</span>
+            </a>
+            <a href="{{ url_for('general_dashboard') }}" class="nav-item {% if request.endpoint == 'general_dashboard' %}active{% endif %}">
+                <i class="bi bi-list-ul"></i>
+                <span>{{ t('general_general_dashboard', default='Dashboard') }}</span>
+            </a>
+            <a href="{{ url_for('budget.main') }}" class="nav-item {% if request.endpoint == 'budget.main' %}active{% endif %}">
+                <i class="bi bi-calculator"></i>
+                <span>{{ t('budget_budget_planner', default='Budget') }}</span>
+            </a>
+            <a href="{{ url_for('net_worth.main') }}" class="nav-item {% if request.endpoint == 'net_worth.main' %}active{% endif %}">
+                <i class="bi bi-balance-scale"></i>
+                <span>{{ t('net_worth_net_worth_calculator', default='Net Worth') }}</span>
+            </a>
+            <a href="{{ url_for('common_bp.news_list') }}" class="nav-item {% if request.endpoint == 'common_bp.news_list' %}active{% endif %}">
+                <i class="bi bi-newspaper"></i>
+                <span>{{ t('general_news', default='News') }}</span>
+            </a>
+            <a href="{{ url_for('taxation_bp.calculate_tax') }}" class="nav-item {% if request.endpoint == 'taxation_bp.calculate_tax' %}active{% endif %}">
+                <i class="bi bi-calculator"></i>
+                <span>{{ t('general_taxation', default='Taxation') }}</span>
+            </a>
+            <a href="{{ url_for('settings_blueprint.profile') }}" class="nav-item {% if request.endpoint == 'settings_blueprint.profile' %}active{% endif %}">
+                <i class="bi bi-person"></i>
+                <span>{{ t('general_profile', default='Profile') }}</span>
+            </a>
+        </div>
+    </nav>
+    {% endif %}
+
+    <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationModalLabel">{{ t('general_notifications', default='Notifications') | e }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('general_close', default='Close') | e }}"></button>
+                </div>
+                <div class="modal-body" id="notificationBody">
+                    <p>{{ t('general_loading_notifications', default='Loading notifications...') | e }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('general_close', default='Close') | e }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-5" style="background: linear-gradient(90deg, #003087, #004D40); color: white;">
+        <div class="container text-center py-4" role="contentinfo">
+            <p>{{ t('general_about_ficore_africa', default='About Ficore Africa') | e }}: {{ t('general_empowering_financial_growth', default='Empowering financial growth across Africa since 2025') | e }}</p>
+            <p class="footer-disclaimer"><i class="fas fa-shield-alt me-1" aria-hidden="true"></i> {{ t('general_disclaimer', default='Ficore is not a bank and does not hold or move funds.') | e }} <a href="{{ url_for('about') | e }}" class="text-white text-decoration-underline">{{ t('general_learn_more', default='Learn more') | e }}</a></p>
+            <div class="social-icons d-flex justify-content-center gap-3">
+                <a href="{{ LINKEDIN_URL }}" target="_blank" aria-label="{{ t('general_connect_on_linkedin', default='Connect on LinkedIn') | e }}" class="d-flex align-items-center text-white">
+                    <i class="fab fa-linkedin me-1"></i> LinkedIn
+                </a>
+                <a href="{{ TWITTER_URL }}" target="_blank" aria-label="{{ t('general_follow_on_twitter', default='Follow on Twitter') | e }}" class="d-flex align-items-center text-white">
+                    <i class="fab fa-x-twitter me-1"></i> Twitter
+                </a>
+                <a href="{{ FACEBOOK_URL }}" target="_blank" aria-label="{{ t('general_follow_on_facebook', default='Follow on Facebook') | e }}" class="d-flex align-items-center text-white">
+                    <i class="fab fa-facebook me-1"></i> Facebook
+                </a>
+            </div>
+            <div class="footer-buttons mt-3">
+                <a href="mailto:support@ficoreafrica.com" class="text-white"><i class="fas fa-envelope"></i> {{ t('general_contact_us', default='Contact Us') | e }}</a>
+                <a href="{{ url_for('feedback') | e }}" class="text-white"><i class="fas fa-comment"></i> {{ t('general_provide_feedback', default='Provide Feedback') | e }}</a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('users_blueprint.logout') | e }}" class="text-white"><i class="fas fa-sign-out-alt"></i> {{ t('general_logout', default='Logout') | e }}</a>
+                {% else %}
+                <a href="{{ url_for('users_blueprint.login') | e }}" class="text-white"><i class="fas fa-sign-in-alt"></i> {{ t('general_login', default='Login') | e }}</a>
+                {% endif %}
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/interactivity.js') | e }}"></script>
+    <script src="{{ url_for('static', filename='js/scripts.js') | e }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Only use stored value, default to light mode
+            const storedDarkMode = localStorage.getItem('dark_mode');
+            const isDark = storedDarkMode === 'true';
+            if (isDark) {
+                document.documentElement.classList.add('dark-mode');
+            } else {
+                document.documentElement.classList.remove('dark-mode');
+            }
+
+            // Set initial dark mode toggle icon
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            if (darkModeToggle) {
+                darkModeToggle.querySelector('i').className = isDark ? 'bi bi-sun' : 'bi bi-moon-stars';
+                darkModeToggle.setAttribute('data-bs-title', isDark ? '{{ t("general_mode_toggle_tooltip_switch_to_light", default="Switch to light mode") | e }}' : '{{ t("general_mode_toggle_tooltip_switch_to_dark", default="Switch to dark mode") | e }}');
+                darkModeToggle.setAttribute('aria-label', isDark ? '{{ t("general_mode_toggle_light", default="Toggle light mode") | e }}' : '{{ t("general_mode_toggle_dark", default="Toggle dark mode") | e }}');
+            }
+
+            // Form validation
+            document.querySelectorAll('form.validate-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    let valid = true;
+                    form.querySelectorAll('.form-control').forEach(input => {
+                        input.classList.add('was-validated');
+                        if (!input.value.trim()) {
+                            input.classList.add('is-invalid');
+                            valid = false;
+                        } else {
+                            input.classList.remove('is-invalid');
+                        }
+                    });
+                    form.querySelectorAll('.form-select').forEach(select => {
+                        select.classList.add('was-validated');
+                        if (!select.value) {
+                            select.classList.add('is-invalid');
+                            valid = false;
+                        } else {
+                            select.classList.remove('is-invalid');
+                        }
+                    });
+                    console.log('Form validation result:', valid ? 'Valid' : 'Invalid', 'Form ID:', form.id);
+                    if (!valid) {
+                        e.preventDefault();
+                        alert('{{ t('general_please_complete_all_fields', default='Please complete all required fields') | e }}');
+                    }
+                });
+            });
+
+            // Consent banner handling
+            const consentBtn = document.getElementById('acknowledgeConsentBtn');
+            if (consentBtn) {
+                consentBtn.addEventListener('click', function() {
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    fetch('{{ url_for("acknowledge_consent") | e }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-Token': csrfToken
+                        },
+                        body: '{}'
+                    })
+                    .then(response => {
+                        if (response.status === 204) {
+                            const banner = document.getElementById('consentBanner');
+                            if (banner) {
+                                banner.classList.remove('show');
+                                setTimeout(() => banner.remove(), 300);
+                            }
+                        } else if (response.status === 400) {
+                            alert('{{ t("general_invalid_request", default="Invalid request. Please try again.") | e }}');
+                        } else {
+                            alert('{{ t("general_error_acknowledging_consent", default="Error acknowledging consent. Please try again.") | e }}');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('{{ t("general_network_error", default="Network error. Please try again.") | e }}');
+                    });
+                });
+            }
+
+            // Tooltip initialization
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            [...tooltipTriggerList].forEach(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+            // Load notification count for authenticated users
+            {% if current_user.is_authenticated %}
+                loadNotificationCount();
+            {% endif %}
+        });
+
+        // Dark mode toggle function
+        window.toggleDarkMode = function () {
+            const isDark = !document.documentElement.classList.contains('dark-mode');
+            document.documentElement.classList.toggle('dark-mode', isDark);
+            localStorage.setItem('dark_mode', isDark);
+
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            if (darkModeToggle) {
+                darkModeToggle.querySelector('i').className = isDark ? 'bi bi-sun' : 'bi bi-moon-stars';
+                darkModeToggle.setAttribute('data-bs-title', isDark ? '{{ t("general_mode_toggle_tooltip_switch_to_light", default="Switch to light mode") | e }}' : '{{ t("general_mode_toggle_tooltip_switch_to_dark", default="Switch to dark mode") | e }}');
+                darkModeToggle.setAttribute('aria-label', isDark ? '{{ t("general_mode_toggle_light", default="Toggle light mode") | e }}' : '{{ t("general_mode_toggle_dark", default="Toggle dark mode") | e }}');
+
+                // Reinitialize tooltip
+                const tooltip = bootstrap.Tooltip.getInstance(darkModeToggle);
+                if (tooltip) tooltip.dispose();
+                new bootstrap.Tooltip(darkModeToggle);
+            }
+        };
+
+        // Load notification count
+        async function loadNotificationCount() {
+            try {
+                const response = await fetch('{{ url_for("notification_count") | e }}');
+                const data = await response.json();
+                const badge = document.getElementById('notificationBadge');
+                if (data.count > 0) {
+                    badge.textContent = data.count;
+                    badge.classList.remove('d-none');
+                } else {
+                    badge.classList.add('d-none');
+                }
+            } catch (error) {
+                console.error('Failed to load notification count:', error);
+            }
+        }
+
+        // Load notifications into modal
+        async function loadNotifications() {
+            const body = document.getElementById('notificationBody');
+            try {
+                const response = await fetch('{{ url_for("notifications") | e }}');
+                const data = await response.json();
+                if (data.error) {
+                    body.innerHTML = `<p class="text-danger">${data.error}</p>`;
+                    return;
+                }
+                body.innerHTML = data.map(notification => `
+                    <div class="notification-item ${notification.read ? 'read' : 'unread'}">
+                        <p>${notification.message} <small class="text-muted">${new Date(notification.timestamp).toLocaleString()}</small></p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                body.innerHTML = `<p class="text-danger">{{ t('general_notification_load_error', default='Failed to load notifications') | e }}</p>`;
+                console.error('Failed to load notifications:', error);
+            }
+        }
+
+        // Event listener for modal show
+        document.addEventListener('DOMContentLoaded', function () {
+            const notificationModal = document.getElementById('notificationModal');
+            if (notificationModal) {
+                notificationModal.addEventListener('show.bs.modal', loadNotifications);
+            }
+        });
+    </script>
+    {% block base_scripts %}{% endblock %}
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
